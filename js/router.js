@@ -13,7 +13,7 @@
 // ============================================================
 
 // Pages valides — doit correspondre aux id des éléments .page dans index.html
-const VALID_PAGES = ['accueil', 'services', 'reservation', 'avis', 'contact'];
+const VALID_PAGES = ['accueil', 'services', 'reservation', 'avis', 'politiques', 'contact'];
 const DEFAULT_PAGE = 'accueil';
 
 // Callbacks déclenchés à l'entrée d'une page spécifique
