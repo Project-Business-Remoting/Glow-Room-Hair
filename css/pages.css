@@ -1,0 +1,558 @@
+/* ============================================================
+   pages.css — Styles spécifiques à chaque page/section SPA
+   Glow Room Studio · Mobile-first · Breakpoint 960px
+   Sections : #accueil · #services · #reservation · #avis · #contact
+   ============================================================ */
+
+/* ─── PAGE : ACCUEIL — HERO ─────────────────────────────────── */
+
+.hero {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  min-height: calc(100dvh - var(--navbar-h));
+  padding-block: var(--space-2xl);
+  position: relative;
+  overflow: hidden;
+}
+
+/* Halo décoratif caramel en arrière-plan */
+.hero::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(ellipse 70% 55% at 85% 45%, rgba(194, 132, 72, 0.09) 0%, transparent 68%);
+  pointer-events: none;
+}
+
+.hero__eyebrow {
+  display: block;
+  font-size: var(--fs-xs);
+  font-weight: 600;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--caramel);
+  margin-bottom: var(--space-md);
+}
+
+.hero__title {
+  font-family: var(--font-serif);
+  color: var(--brown);
+  line-height: 1.15;
+  max-width: 620px;
+}
+
+.hero__title em {
+  font-style: italic;
+  color: var(--caramel);
+}
+
+.hero__subtitle {
+  color: var(--muted);
+  font-size: var(--fs-base);
+  max-width: 460px;
+  margin-block: var(--space-lg);
+  line-height: 1.75;
+}
+
+.hero__actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-md);
+}
+
+/* Indicateurs de confiance sous les CTA */
+.hero__trust {
+  margin-top: var(--space-2xl);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-sm);
+}
+
+.hero__trust-item {
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm);
+  font-size: var(--fs-sm);
+  color: var(--muted);
+}
+
+.hero__trust-icon { color: var(--caramel); flex-shrink: 0; }
+
+@media (min-width: 960px) {
+  .hero__title { font-size: var(--fs-3xl); }
+  .hero__subtitle { font-size: var(--fs-md); }
+  .hero__trust { flex-direction: row; gap: var(--space-xl); }
+}
+
+/* ─── PAGE : SERVICES ───────────────────────────────────────── */
+
+/* Onglets Femmes / Hommes */
+.services-tabs {
+  display: flex;
+  gap: 0;
+  margin-bottom: var(--space-2xl);
+  border-bottom: 2px solid var(--border);
+}
+
+.services-tab {
+  padding: var(--space-sm) var(--space-lg);
+  font-weight: 600;
+  font-size: var(--fs-sm);
+  color: var(--muted);
+  border-bottom: 3px solid transparent;
+  margin-bottom: -2px;
+  cursor: pointer;
+  transition: color var(--tr), border-color var(--tr);
+  background: none;
+  border-top: none;
+  border-inline: none;
+}
+
+.services-tab:hover { color: var(--brown); }
+
+.services-tab.is-active {
+  color: var(--caramel);
+  border-bottom-color: var(--caramel);
+}
+
+/* Panneau de services (affiché / masqué par JS) */
+.services-panel { display: none; }
+.services-panel.is-active { display: grid; gap: var(--space-lg); }
+
+@media (min-width: 960px) {
+  .services-panel.is-active { grid-template-columns: repeat(3, 1fr); }
+}
+
+.services-page__note {
+  margin-top: var(--space-xl);
+}
+
+/* ─── PAGE : RÉSERVATION ────────────────────────────────────── */
+
+.booking-page {
+  max-width: 660px;
+  margin-inline: auto;
+  padding-block: var(--space-xl) var(--space-2xl);
+}
+
+/* Chaque step entre en animation — @keyframes fadeSlide défini dans layout.css */
+.booking-step {
+  animation: fadeSlide var(--tr-slide) both;
+}
+
+.booking-step__title {
+  font-family: var(--font-serif);
+  font-size: var(--fs-lg);
+  color: var(--brown);
+  margin-bottom: var(--space-xs);
+}
+
+.booking-step__subtitle {
+  font-size: var(--fs-sm);
+  color: var(--muted);
+  margin-bottom: var(--space-xl);
+}
+
+/* Récapitulatif des choix précédents */
+.booking-summary {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  padding: var(--space-md) var(--space-lg);
+  margin-bottom: var(--space-xl);
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-sm) var(--space-xl);
+}
+
+.booking-summary__item { display: flex; flex-direction: column; gap: 2px; }
+
+.booking-summary__label {
+  font-size: var(--fs-xs);
+  color: var(--muted);
+  text-transform: uppercase;
+  letter-spacing: 0.07em;
+}
+
+.booking-summary__value {
+  font-size: var(--fs-sm);
+  font-weight: 600;
+  color: var(--brown);
+}
+
+/* ── Step 2 : Calendrier ── */
+
+.booking-calendar {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: var(--space-xs);
+  margin-bottom: var(--space-xl);
+}
+
+.booking-calendar__day-name {
+  text-align: center;
+  font-size: var(--fs-xs);
+  font-weight: 600;
+  color: var(--muted);
+  padding-bottom: var(--space-sm);
+}
+
+.booking-calendar__day {
+  aspect-ratio: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: var(--radius-sm);
+  font-size: var(--fs-xs);
+  cursor: pointer;
+  border: 1px solid transparent;
+  transition: background var(--tr), border-color var(--tr), color var(--tr);
+}
+
+.booking-calendar__day:not(.is-disabled):not(.is-selected):hover {
+  background: var(--bg2);
+  border-color: var(--border);
+}
+
+.booking-calendar__day.is-today {
+  font-weight: 700;
+  color: var(--caramel);
+}
+
+.booking-calendar__day.is-selected {
+  background: var(--caramel);
+  color: var(--cream);
+  font-weight: 600;
+  border-color: var(--caramel);
+}
+
+.booking-calendar__day.is-disabled {
+  color: var(--border);
+  cursor: default;
+}
+
+/* ── Step 2 : Créneaux horaires ── */
+
+.booking-slots {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: var(--space-sm);
+}
+
+@media (min-width: 960px) {
+  .booking-slots { grid-template-columns: repeat(5, 1fr); }
+}
+
+.booking-slot {
+  padding: var(--space-sm);
+  text-align: center;
+  font-size: var(--fs-sm);
+  border: 1.5px solid var(--border);
+  border-radius: var(--radius-sm);
+  background: var(--cream);
+  cursor: pointer;
+  transition: border-color var(--tr), background var(--tr), color var(--tr);
+}
+
+.booking-slot:hover { border-color: var(--caramel); }
+
+.booking-slot.is-selected {
+  background: var(--caramel);
+  border-color: var(--caramel);
+  color: var(--cream);
+  font-weight: 600;
+}
+
+.booking-slot.is-unavailable {
+  opacity: 0.3;
+  cursor: default;
+  pointer-events: none;
+}
+
+/* ── Step 4 : Dépôt & Paiement ── */
+
+.deposit-info {
+  background: rgba(194, 132, 72, 0.07);
+  border: 1px solid rgba(194, 132, 72, 0.28);
+  border-radius: var(--radius-md);
+  padding: var(--space-lg);
+  margin-bottom: var(--space-xl);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-xs);
+}
+
+.deposit-info__amount {
+  font-family: var(--font-serif);
+  font-size: var(--fs-xl);
+  font-weight: 700;
+  color: var(--caramel);
+}
+
+.deposit-info__text {
+  font-size: var(--fs-sm);
+  color: var(--muted);
+}
+
+.payment-methods {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-sm);
+}
+
+.payment-method {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--space-md);
+  padding: var(--space-md) var(--space-lg);
+  border: 1.5px solid var(--border);
+  border-radius: var(--radius-md);
+  background: var(--cream);
+  cursor: pointer;
+  transition: border-color var(--tr), background var(--tr);
+}
+
+.payment-method:hover { border-color: var(--caramel); }
+
+.payment-method.is-selected {
+  border-color: var(--caramel);
+  background: rgba(194, 132, 72, 0.05);
+}
+
+/* Bouton radio custom */
+.payment-method__radio {
+  width: 20px;
+  height: 20px;
+  border-radius: var(--radius-full);
+  border: 2px solid var(--border);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  margin-top: 2px;
+  transition: border-color var(--tr);
+}
+
+.payment-method.is-selected .payment-method__radio { border-color: var(--caramel); }
+
+.payment-method.is-selected .payment-method__radio::after {
+  content: '';
+  width: 10px;
+  height: 10px;
+  border-radius: var(--radius-full);
+  background: var(--caramel);
+}
+
+.payment-method__label {
+  font-weight: 500;
+  font-size: var(--fs-base);
+  color: var(--text);
+}
+
+.payment-method__note {
+  font-size: var(--fs-xs);
+  color: var(--muted);
+  margin-top: 2px;
+}
+
+/* ── Step 5 : Confirmation ── */
+
+.booking-confirmation {
+  text-align: center;
+  padding-block: var(--space-2xl);
+}
+
+.booking-confirmation__icon {
+  font-size: 3.5rem;
+  margin-bottom: var(--space-lg);
+}
+
+.booking-confirmation__title {
+  font-family: var(--font-serif);
+  font-size: var(--fs-xl);
+  color: var(--brown);
+  margin-bottom: var(--space-md);
+}
+
+.booking-confirmation__text {
+  color: var(--muted);
+  font-size: var(--fs-sm);
+  line-height: 1.75;
+  max-width: 400px;
+  margin-inline: auto;
+}
+
+.booking-confirmation__recap {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  padding: var(--space-lg);
+  margin: var(--space-xl) auto;
+  max-width: 380px;
+  text-align: left;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-sm);
+}
+
+.booking-confirmation__recap-row {
+  display: flex;
+  justify-content: space-between;
+  font-size: var(--fs-sm);
+  padding-bottom: var(--space-sm);
+  border-bottom: 1px solid var(--border);
+}
+
+.booking-confirmation__recap-row:last-child { border-bottom: none; padding-bottom: 0; }
+
+.booking-confirmation__recap-label { color: var(--muted); }
+.booking-confirmation__recap-value { font-weight: 600; color: var(--brown); }
+
+/* Navigation bas du tunnel */
+.booking-nav {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: var(--space-xl);
+  padding-top: var(--space-lg);
+  border-top: 1px solid var(--border);
+}
+
+/* ─── PAGE : AVIS ───────────────────────────────────────────── */
+
+.reviews-page__rating {
+  text-align: center;
+  margin-bottom: var(--space-2xl);
+  padding: var(--space-xl);
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+}
+
+.reviews-page__score {
+  font-family: var(--font-serif);
+  font-size: var(--fs-3xl);
+  font-weight: 700;
+  color: var(--brown);
+  line-height: 1;
+}
+
+.reviews-page__stars {
+  color: var(--caramel);
+  font-size: var(--fs-xl);
+  margin-block: var(--space-sm) var(--space-xs);
+  letter-spacing: 2px;
+}
+
+.reviews-page__count {
+  font-size: var(--fs-sm);
+  color: var(--muted);
+}
+
+.reviews-grid {
+  display: grid;
+  gap: var(--space-lg);
+}
+
+@media (min-width: 960px) {
+  .reviews-grid { grid-template-columns: repeat(2, 1fr); }
+}
+
+/* ─── PAGE : CONTACT ────────────────────────────────────────── */
+
+.contact-page__grid {
+  display: grid;
+  gap: var(--space-2xl);
+}
+
+@media (min-width: 960px) {
+  .contact-page__grid { grid-template-columns: 1fr 1.5fr; gap: var(--space-3xl); }
+}
+
+/* Bloc d'informations */
+.contact-info {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-lg);
+}
+
+.contact-info__item {
+  display: flex;
+  gap: var(--space-md);
+  align-items: flex-start;
+}
+
+.contact-info__icon {
+  width: 42px;
+  height: 42px;
+  border-radius: var(--radius-md);
+  background: var(--bg2);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--caramel);
+  font-size: var(--fs-lg);
+  flex-shrink: 0;
+}
+
+.contact-info__label {
+  font-size: var(--fs-xs);
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.09em;
+  color: var(--muted);
+  margin-bottom: var(--space-xs);
+}
+
+.contact-info__value {
+  font-size: var(--fs-base);
+  color: var(--text);
+  font-weight: 500;
+}
+
+.contact-info__value a {
+  transition: color var(--tr);
+}
+
+.contact-info__value a:hover { color: var(--caramel); }
+
+/* Tableau des horaires */
+.contact-hours {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+}
+
+.contact-hours__row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding-block: var(--space-sm);
+  border-bottom: 1px solid var(--border);
+  font-size: var(--fs-sm);
+}
+
+.contact-hours__row:last-child { border-bottom: none; }
+.contact-hours__day { color: var(--muted); }
+.contact-hours__time { font-weight: 500; color: var(--text); }
+.contact-hours__time--closed { color: var(--border); font-weight: 400; }
+.contact-hours__time--variable { font-size: var(--fs-xs); color: var(--muted); display: block; }
+
+/* Formulaire de contact */
+.contact-form {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  padding: var(--space-xl);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-md);
+}
+
+.contact-form__title {
+  font-family: var(--font-serif);
+  font-size: var(--fs-lg);
+  color: var(--brown);
+  margin-bottom: var(--space-xs);
+}

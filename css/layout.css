@@ -1,0 +1,319 @@
+/* ============================================================
+   layout.css — Navbar, Footer, Grilles, Structure SPA
+   Glow Room Studio · Mobile-first · Breakpoint 960px
+   ============================================================ */
+
+/* ─── NAVBAR ────────────────────────────────────────────────── */
+
+.navbar {
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  height: var(--navbar-h);
+  background-color: var(--cream);
+  border-bottom: 1px solid var(--border);
+  box-shadow: var(--shadow-sm);
+}
+
+.navbar__inner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  height: 100%;
+}
+
+.navbar__logo {
+  font-family: var(--font-serif);
+  font-size: var(--fs-lg);
+  font-weight: 700;
+  color: var(--brown);
+  letter-spacing: -0.01em;
+  flex-shrink: 0;
+}
+
+.navbar__logo span { color: var(--caramel); }
+
+/* ── Bouton hamburger (mobile uniquement) ── */
+
+.navbar__toggle {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 5px;
+  width: 40px;
+  height: 40px;
+  padding: 6px;
+  border-radius: var(--radius-sm);
+  transition: background var(--tr);
+}
+
+.navbar__toggle:hover { background: var(--bg2); }
+
+.navbar__toggle span {
+  display: block;
+  width: 100%;
+  height: 2px;
+  background: var(--brown);
+  border-radius: var(--radius-full);
+  transition: transform var(--tr), opacity var(--tr);
+}
+
+/* Transformation hamburger → croix */
+.navbar__toggle.is-active span:nth-child(1) { transform: translateY(7px) rotate(45deg); }
+.navbar__toggle.is-active span:nth-child(2) { opacity: 0; transform: scaleX(0); }
+.navbar__toggle.is-active span:nth-child(3) { transform: translateY(-7px) rotate(-45deg); }
+
+/* ── Menu mobile — panneau latéral droit ── */
+
+.navbar__menu {
+  position: fixed;
+  inset: 0 0 0 auto;
+  width: min(300px, 82vw);
+  background: var(--cream);
+  border-left: 1px solid var(--border);
+  box-shadow: var(--shadow-lg);
+  transform: translateX(100%);
+  transition: transform var(--tr-menu);
+  display: flex;
+  flex-direction: column;
+  padding: calc(var(--navbar-h) + var(--space-xl)) var(--space-xl) var(--space-xl);
+  gap: var(--space-xs);
+  z-index: 99;
+}
+
+.navbar__menu.is-open { transform: translateX(0); }
+
+/* Fond semi-opaque derrière le menu */
+.navbar__overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(46, 26, 10, 0.38);
+  z-index: 98;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity var(--tr-menu);
+}
+
+.navbar__overlay.is-open {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+.navbar__link {
+  display: block;
+  font-size: var(--fs-base);
+  font-weight: 500;
+  color: var(--text);
+  padding: var(--space-sm) 0;
+  border-bottom: 1px solid var(--border);
+  transition: color var(--tr), padding-left var(--tr);
+}
+
+.navbar__link:last-of-type { border-bottom: none; }
+
+.navbar__link:hover,
+.navbar__link.is-active {
+  color: var(--caramel);
+  padding-left: var(--space-xs);
+}
+
+.navbar__cta { margin-top: var(--space-lg); }
+
+/* ── Desktop navbar ── */
+
+@media (min-width: 960px) {
+  .navbar__toggle { display: none; }
+
+  .navbar__menu {
+    position: static;
+    width: auto;
+    background: none;
+    border: none;
+    box-shadow: none;
+    transform: none;
+    flex-direction: row;
+    align-items: center;
+    padding: 0;
+    gap: var(--space-xl);
+    transition: none;
+  }
+
+  .navbar__link {
+    border: none;
+    padding: 0;
+    font-size: var(--fs-sm);
+  }
+
+  .navbar__link:hover,
+  .navbar__link.is-active {
+    padding-left: 0;
+  }
+
+  .navbar__cta { margin-top: 0; }
+}
+
+/* ─── FOOTER ────────────────────────────────────────────────── */
+
+.footer {
+  background-color: var(--brown);
+  padding-block: var(--space-2xl) var(--space-lg);
+}
+
+.footer__grid {
+  display: grid;
+  gap: var(--space-xl);
+  margin-bottom: var(--space-xl);
+}
+
+.footer__brand {
+  font-family: var(--font-serif);
+  font-size: var(--fs-lg);
+  font-weight: 700;
+  color: var(--cream);
+  margin-bottom: var(--space-sm);
+}
+
+.footer__brand span { color: var(--caramel2); }
+
+.footer__tagline {
+  color: var(--caramel2);
+  font-size: var(--fs-sm);
+  opacity: 0.85;
+}
+
+.footer__heading {
+  font-family: var(--font-serif);
+  font-size: var(--fs-base);
+  font-weight: 600;
+  color: var(--caramel2);
+  margin-bottom: var(--space-md);
+}
+
+.footer__list {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-sm);
+}
+
+.footer__list a,
+.footer__list span {
+  color: rgba(253, 248, 242, 0.7);
+  font-size: var(--fs-sm);
+  transition: color var(--tr);
+}
+
+.footer__list a:hover { color: var(--caramel2); }
+
+.footer__bottom {
+  border-top: 1px solid rgba(253, 248, 242, 0.12);
+  padding-top: var(--space-lg);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-sm);
+  text-align: center;
+}
+
+.footer__copy {
+  font-size: var(--fs-xs);
+  color: rgba(253, 248, 242, 0.4);
+}
+
+.footer__socials {
+  display: flex;
+  gap: var(--space-lg);
+}
+
+.footer__social-link {
+  font-size: var(--fs-sm);
+  color: rgba(253, 248, 242, 0.65);
+  transition: color var(--tr);
+}
+
+.footer__social-link:hover { color: var(--caramel2); }
+
+@media (min-width: 960px) {
+  .footer__grid {
+    grid-template-columns: 2fr 1fr 1fr;
+    gap: var(--space-2xl);
+  }
+
+  .footer__bottom {
+    flex-direction: row;
+    justify-content: space-between;
+    text-align: left;
+  }
+}
+
+/* ─── GRILLES GÉNÉRIQUES ────────────────────────────────────── */
+
+.grid { display: grid; gap: var(--space-lg); }
+
+.grid--2 { grid-template-columns: 1fr; }
+.grid--3 { grid-template-columns: 1fr; }
+.grid--4 { grid-template-columns: repeat(2, 1fr); }
+
+@media (min-width: 960px) {
+  .grid--2 { grid-template-columns: repeat(2, 1fr); }
+  .grid--3 { grid-template-columns: repeat(3, 1fr); }
+  .grid--4 { grid-template-columns: repeat(4, 1fr); }
+}
+
+/* ─── STRUCTURE SPA ─────────────────────────────────────────── */
+/* router.js alterne .page--active pour afficher la section courante */
+
+.page {
+  display: none;
+  min-height: calc(100dvh - var(--navbar-h));
+}
+
+.page--active {
+  display: block;
+  animation: fadeSlide var(--tr-slide) both;
+}
+
+/* Transition booking step-to-step (réutilisée dans pages.css) */
+@keyframes fadeSlide {
+  from { opacity: 0; transform: translateY(14px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+/* ─── SECTION HEADER ────────────────────────────────────────── */
+
+.section-header {
+  margin-bottom: var(--space-2xl);
+}
+
+.section-header--center {
+  text-align: center;
+}
+
+.section-header--center .divider {
+  margin-inline: auto;
+}
+
+.section-header__eyebrow {
+  display: block;
+  font-size: var(--fs-xs);
+  font-weight: 600;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--caramel);
+  margin-bottom: var(--space-sm);
+}
+
+.section-header__title {
+  font-family: var(--font-serif);
+}
+
+.section-header__subtitle {
+  color: var(--muted);
+  font-size: var(--fs-sm);
+  margin-top: var(--space-sm);
+  max-width: 520px;
+  line-height: 1.7;
+}
+
+.section-header--center .section-header__subtitle {
+  margin-inline: auto;
+}

@@ -1,0 +1,199 @@
+/* ============================================================
+   base.css — Reset, Variables CSS, Typographie
+   Glow Room Studio · Mobile-first
+   ============================================================ */
+
+/* ─── GOOGLE FONTS ──────────────────────────────────────────── */
+
+@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400&family=Jost:wght@300;400;500;600&display=swap');
+
+/* ─── VARIABLES CSS ─────────────────────────────────────────── */
+
+:root {
+  /* Palette — source : cahier des charges */
+  --bg:       #f7f0e8;
+  --bg2:      #ede3d6;
+  --card:     #faf5ee;
+  --cream:    #fdf8f2;
+  --brown:    #3b1f0c;
+  --brown2:   #6b3a1f;
+  --caramel:  #c28448;
+  --caramel2: #d9a96e;
+  --text:     #2e1a0a;
+  --muted:    #8c6b52;
+  --border:   #d9c8b4;
+
+  /* Typographie */
+  --font-serif: 'Playfair Display', Georgia, serif;
+  --font-sans:  'Jost', system-ui, sans-serif;
+
+  /* Échelle de police (mobile) */
+  --fs-xs:   0.75rem;
+  --fs-sm:   0.875rem;
+  --fs-base: 1rem;
+  --fs-md:   1.125rem;
+  --fs-lg:   1.375rem;
+  --fs-xl:   1.75rem;
+  --fs-2xl:  2.25rem;
+  --fs-3xl:  3rem;
+
+  /* Espacements */
+  --space-xs:  0.25rem;
+  --space-sm:  0.5rem;
+  --space-md:  1rem;
+  --space-lg:  1.5rem;
+  --space-xl:  2rem;
+  --space-2xl: 3rem;
+  --space-3xl: 5rem;
+
+  /* Rayons */
+  --radius-sm:   6px;
+  --radius-md:   12px;
+  --radius-lg:   20px;
+  --radius-full: 9999px;
+
+  /* Ombres */
+  --shadow-sm: 0 1px 4px rgba(59, 31, 12, 0.08);
+  --shadow-md: 0 4px 16px rgba(59, 31, 12, 0.12);
+  --shadow-lg: 0 8px 32px rgba(59, 31, 12, 0.18);
+
+  /* Transitions — source : cahier des charges */
+  --tr:        0.22s ease;
+  --tr-slide:  0.35s ease;
+  --tr-menu:   0.35s cubic-bezier(.4, 0, .2, 1);
+
+  /* Layout */
+  --navbar-h:      64px;
+  --content-max:   1100px;
+  --content-px:    1rem;
+}
+
+/* ─── RESET ─────────────────────────────────────────────────── */
+
+*, *::before, *::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html {
+  scroll-behavior: smooth;
+  -webkit-text-size-adjust: 100%;
+  hanging-punctuation: first last;
+}
+
+body {
+  font-family: var(--font-sans);
+  font-size: var(--fs-base);
+  line-height: 1.6;
+  color: var(--text);
+  background-color: var(--bg);
+  min-height: 100dvh;
+  -webkit-font-smoothing: antialiased;
+}
+
+img, video, svg {
+  display: block;
+  max-width: 100%;
+  height: auto;
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+}
+
+ul, ol {
+  list-style: none;
+}
+
+button, input, select, textarea {
+  font: inherit;
+  border: none;
+  background: none;
+  outline: none;
+}
+
+button { cursor: pointer; }
+
+/* ─── TYPOGRAPHIE ───────────────────────────────────────────── */
+
+h1, h2, h3, h4 {
+  font-family: var(--font-serif);
+  font-weight: 700;
+  line-height: 1.2;
+  color: var(--brown);
+}
+
+h1 { font-size: var(--fs-xl); }
+h2 { font-size: var(--fs-lg); }
+h3 { font-size: var(--fs-md); }
+h4 { font-size: var(--fs-base); font-weight: 600; }
+
+p { line-height: 1.7; }
+
+strong { font-weight: 600; }
+
+/* ─── ACCESSIBILITÉ ─────────────────────────────────────────── */
+
+:focus-visible {
+  outline: 2px solid var(--caramel);
+  outline-offset: 3px;
+  border-radius: var(--radius-sm);
+}
+
+.sr-only {
+  position: absolute;
+  width: 1px; height: 1px;
+  padding: 0; margin: -1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+/* ─── UTILITAIRES GLOBAUX ───────────────────────────────────── */
+
+.container {
+  width: 100%;
+  max-width: var(--content-max);
+  margin-inline: auto;
+  padding-inline: var(--content-px);
+}
+
+.section {
+  padding-block: var(--space-2xl);
+}
+
+/* Trait de séparation caramel sous les titres de section */
+.divider {
+  width: 48px;
+  height: 3px;
+  background: var(--caramel);
+  border-radius: var(--radius-full);
+  margin-block: var(--space-md);
+}
+
+.divider--center { margin-inline: auto; }
+
+/* Classes de couleur */
+.text-muted    { color: var(--muted); }
+.text-caramel  { color: var(--caramel); }
+.text-brown    { color: var(--brown); }
+.text-center   { text-align: center; }
+
+/* ─── DESKTOP (960px) ───────────────────────────────────────── */
+
+@media (min-width: 960px) {
+  :root {
+    --content-px: 2rem;
+  }
+
+  h1 { font-size: var(--fs-2xl); }
+  h2 { font-size: var(--fs-xl); }
+  h3 { font-size: var(--fs-lg); }
+
+  .section {
+    padding-block: var(--space-3xl);
+  }
+}
