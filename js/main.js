@@ -5,11 +5,12 @@
 //  Ce fichier orchestre uniquement — aucune logique métier.
 // ============================================================
 
-import { initRouter }   from './router.js';
-import { initServices } from './services.js';
-import { initReviews }  from './reviews.js';
-import { initContact }  from './contact.js';
-import { initBooking }  from './booking.js';
+import { initRouter, navigate } from './router.js';
+import { initServices }         from './services.js';
+import { initReviews }          from './reviews.js';
+import { initContact }          from './contact.js';
+import { initBooking }          from './booking.js';
+import { initPaymentResult }    from './payment-result.js';
 
 // ─── BOOTSTRAP ───────────────────────────────────────────────
 
@@ -21,12 +22,18 @@ document.addEventListener('DOMContentLoaded', () => {
   initReviews();
   initContact();
   initBooking();
+  initPaymentResult();
 
   _setupMobileMenu();
   _setupToasts();
 
   // En dernier : déclenche la navigation initiale vers la page du hash courant
   initRouter();
+
+  // Retour depuis Stripe : ?session_id= présent → forcer la page success
+  if (new URLSearchParams(window.location.search).has('session_id')) {
+    navigate('success', { replace: true });
+  }
 });
 
 // ─── MENU MOBILE ─────────────────────────────────────────────
