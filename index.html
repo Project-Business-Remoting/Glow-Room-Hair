@@ -1,327 +1,488 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="fr-CA">
+  <head>
+    <!-- ── Essentiels ─────────────────────────────────────── -->
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
-<head>
-  <!-- ── Essentiels ─────────────────────────────────────── -->
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <!-- ── SEO ───────────────────────────────────────────── -->
+    <title>Glow Room Studio — Braids &amp; Ottawa</title>
+    <meta
+      name="description"
+      content="Salon spécialisé en tresses et coiffures protectrices à Ottawa–Gatineau. Knotless Braids, Goddess Braids, Locks et plus. Réservez en ligne — dépôt de 15$ seulement."
+    />
+    <meta name="robots" content="index, follow" />
 
-  <!-- ── SEO ───────────────────────────────────────────── -->
-  <title>Glow Room Studio — Braids &amp; Ottawa</title>
-  <meta name="description"
-    content="Salon spécialisé en tresses et coiffures protectrices à Ottawa–Gatineau. Knotless Braids, Goddess Braids, Locks et plus. Réservez en ligne — dépôt de 15$ seulement." />
-  <meta name="robots" content="index, follow" />
+    <!-- ── Open Graph ────────────────────────────────────── -->
+    <meta
+      property="og:title"
+      content="Glow Room Studio — Braids &amp; Ottawa"
+    />
+    <meta
+      property="og:description"
+      content="Salon spécialisé en tresses et coiffures protectrices à Ottawa–Gatineau. Réservez votre rendez-vous en ligne."
+    />
+    <meta property="og:type" content="website" />
+    <meta property="og:locale" content="fr_CA" />
 
-  <!-- ── Open Graph ────────────────────────────────────── -->
-  <meta property="og:title"       content="Glow Room Studio — Braids &amp; Ottawa" />
-  <meta property="og:description" content="Salon spécialisé en tresses et coiffures protectrices à Ottawa–Gatineau. Réservez votre rendez-vous en ligne." />
-  <meta property="og:type"        content="website" />
-  <meta property="og:locale"      content="fr_CA" />
+    <!-- ── Canonical ─────────────────────────────────────── -->
+    <link rel="canonical" href="https://glowroomstudio.ca/" />
+    <link rel="icon" type="image/jpeg" href="images/logo-principal.webp" />
 
-  <!-- ── Canonical ─────────────────────────────────────── -->
-  <link rel="canonical" href="https://glowroomstudio.ca/" />
+    <!-- ── Google Fonts — preconnect avant @import dans base.css ── -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
 
-  <!-- ── Google Fonts — preconnect avant @import dans base.css ── -->
-  <link rel="preconnect" href="https://fonts.googleapis.com" />
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <!-- ── CSS — ordre de dépendance strict ──────────────── -->
+    <link rel="stylesheet" href="css/base.css" />
+    <link rel="stylesheet" href="css/layout.css" />
+    <link rel="stylesheet" href="css/components.css" />
+    <link rel="stylesheet" href="css/pages.css" />
+  </head>
 
-  <!-- ── CSS — ordre de dépendance strict ──────────────── -->
-  <link rel="stylesheet" href="css/base.css" />
-  <link rel="stylesheet" href="css/layout.css" />
-  <link rel="stylesheet" href="css/components.css" />
-  <link rel="stylesheet" href="css/pages.css" />
-</head>
+  <body>
+    <!-- Lien d'évitement pour les lecteurs d'écran -->
+    <a class="sr-only" href="#main-content">Passer au contenu principal</a>
 
-<body>
-
-  <!-- Lien d'évitement pour les lecteurs d'écran -->
-  <a class="sr-only" href="#main-content">Passer au contenu principal</a>
-
-  <!-- ════════════════════════════════════════════════════
+    <!-- ════════════════════════════════════════════════════
        NAVBAR
        ════════════════════════════════════════════════════ -->
-  <nav class="navbar" aria-label="Navigation principale">
-    <div class="container navbar__inner">
+    <nav class="navbar" aria-label="Navigation principale">
+      <div class="container navbar__inner">
+        <!-- Logo -->
+        <a
+          class="navbar__logo"
+          data-nav="accueil"
+          href="/"
+          aria-label="Glow Room Studio — retour à l'accueil"
+        >
+          <img
+            src="images/logo-principal.webp"
+            alt="Glow Room Hair"
+            height="60"
+            style="height: 60px; width: auto; object-fit: contain"
+          />
+          <span class="navbar__logo-text">Glow Room Hair</span>
+        </a>
 
-      <!-- Logo -->
-      <a class="navbar__logo"
-         data-nav="accueil"
-         href="/"
-         aria-label="Glow Room Studio — retour à l'accueil">
-        Glow <span>Room</span>
-      </a>
+        <!-- Bouton hamburger (visible uniquement sur mobile) -->
+        <button
+          type="button"
+          class="navbar__toggle"
+          aria-label="Ouvrir le menu de navigation"
+          aria-expanded="false"
+          aria-controls="nav-menu"
+        >
+          <span></span>
+          <span></span>
+          <span></span>
+        </button>
 
-      <!-- Bouton hamburger (visible uniquement sur mobile) -->
-      <button
-        type="button"
-        class="navbar__toggle"
-        aria-label="Ouvrir le menu de navigation"
-        aria-expanded="false"
-        aria-controls="nav-menu"
-      >
-        <span></span>
-        <span></span>
-        <span></span>
-      </button>
-
-      <!-- Menu de navigation -->
-      <div class="navbar__menu" id="nav-menu" aria-label="Menu de navigation">
-        <a class="navbar__link" data-nav="accueil"    href="/">Accueil</a>
-        <a class="navbar__link" data-nav="services"   href="#services">Services</a>
-        <a class="navbar__link" data-nav="avis"       href="#avis">Avis</a>
-        <a class="navbar__link" data-nav="contact"    href="#contact">Contact</a>
-        <div class="navbar__cta">
-          <button type="button" class="btn btn-dark btn--sm" data-nav="reservation">
-            Réserver
-          </button>
+        <!-- Menu de navigation -->
+        <div class="navbar__menu" id="nav-menu" aria-label="Menu de navigation">
+          <a class="navbar__link" data-nav="accueil" href="/">Accueil</a>
+          <a class="navbar__link" data-nav="services" href="#services"
+            >Services</a
+          >
+          <a class="navbar__link" data-nav="avis" href="#avis">Avis</a>
+          <a class="navbar__link" data-nav="contact" href="#contact">Contact</a>
+          <div class="navbar__cta">
+            <button
+              type="button"
+              class="btn btn-dark btn--sm"
+              data-nav="reservation"
+            >
+              Réserver
+            </button>
+          </div>
         </div>
       </div>
 
-    </div>
+      <!-- Fond semi-opaque affiché derrière le menu mobile -->
+      <div class="navbar__overlay" aria-hidden="true"></div>
+    </nav>
 
-    <!-- Fond semi-opaque affiché derrière le menu mobile -->
-    <div class="navbar__overlay" aria-hidden="true"></div>
-  </nav>
-
-  <!-- ════════════════════════════════════════════════════
+    <!-- ════════════════════════════════════════════════════
        CONTENU PRINCIPAL
        ════════════════════════════════════════════════════ -->
-  <main id="main-content">
-
-    <!-- ──────────────────────────────────────────────────
+    <main id="main-content">
+      <!-- ──────────────────────────────────────────────────
          ACCUEIL — Hero statique (pas généré par JS)
          ────────────────────────────────────────────────── -->
-    <section id="accueil" class="page page--active" aria-labelledby="hero-title">
-      <div class="hero">
-        <div class="container">
+      <section
+        id="accueil"
+        class="page page--active"
+        aria-labelledby="hero-title"
+      >
+        <div class="hero">
+          <div class="container">
+            <span class="hero__eyebrow">Ottawa – Gatineau · Canada</span>
 
-          <span class="hero__eyebrow">Ottawa – Gatineau · Canada</span>
+            <h1 class="hero__title" id="hero-title">
+              Des tresses <em>qui subliment</em>,<br />
+              un soin qui dure.
+            </h1>
 
-          <h1 class="hero__title" id="hero-title">
-            Des tresses <em>qui subliment</em>,<br>
-            un soin qui dure.
-          </h1>
+            <p class="hero__subtitle">
+              Spécialistes en tresses et coiffures protectrices — Knotless
+              Braids, Goddess Braids, Locks et bien plus. Réservez votre
+              rendez-vous en quelques clics.
+            </p>
 
-          <p class="hero__subtitle">
-            Spécialistes en tresses et coiffures protectrices —
-            Knotless Braids, Goddess Braids, Locks et bien plus.
-            Réservez votre rendez-vous en quelques clics.
-          </p>
+            <div class="hero__actions">
+              <button
+                type="button"
+                class="btn btn-dark btn--lg"
+                data-nav="reservation"
+              >
+                Réserver maintenant
+              </button>
+              <button type="button" class="btn btn-ghost" data-nav="services">
+                Voir les services
+              </button>
+            </div>
 
-          <div class="hero__actions">
-            <button type="button" class="btn btn-dark btn--lg" data-nav="reservation">
-              Réserver maintenant
-            </button>
-            <button type="button" class="btn btn-ghost" data-nav="services">
-              Voir les services
-            </button>
+            <div class="hero__trust" aria-label="Nos engagements">
+              <div class="hero__trust-item">
+                <span class="hero__trust-icon" aria-hidden="true">✓</span>
+                <span>Spécialistes en coiffures protectrices</span>
+              </div>
+              <div class="hero__trust-item">
+                <span class="hero__trust-icon" aria-hidden="true">✓</span>
+                <span>Réservation en ligne 24h/24</span>
+              </div>
+              <div class="hero__trust-item">
+                <span class="hero__trust-icon" aria-hidden="true">✓</span>
+                <span>Dépôt de 15$ seulement</span>
+              </div>
+            </div>
           </div>
-
-          <div class="hero__trust" aria-label="Nos engagements">
-            <div class="hero__trust-item">
-              <span class="hero__trust-icon" aria-hidden="true">✓</span>
-              <span>Spécialistes en coiffures protectrices</span>
-            </div>
-            <div class="hero__trust-item">
-              <span class="hero__trust-icon" aria-hidden="true">✓</span>
-              <span>Réservation en ligne 24h/24</span>
-            </div>
-            <div class="hero__trust-item">
-              <span class="hero__trust-icon" aria-hidden="true">✓</span>
-              <span>Dépôt de 15$ seulement</span>
-            </div>
+          <div class="hero__image">
+            <img
+              src="images/marley-twist.jpg"
+              alt="Boho Braids bas du dos — Glow Room Hair Ottawa"
+              loading="eager"
+            />
           </div>
-
         </div>
-      </div>
-    </section>
 
-    <!-- ──────────────────────────────────────────────────
+        <div class="gallery container section">
+          <header class="section-header section-header--center">
+            <span class="section-header__eyebrow">Notre travail</span>
+            <h2 class="section-header__title">Galerie</h2>
+            <div class="divider divider--center"></div>
+          </header>
+          <div class="gallery__grid">
+            <div class="gallery__item">
+              <img
+                src="images/IMAGLOWROOM-6.jpeg"
+                alt="Marley Twists bas du dos — Glow Room Hair"
+                loading="lazy"
+              />
+            </div>
+            <div class="gallery__item">
+              <img
+                src="images/IMAGLOWROOM-8.jpeg"
+                alt="Marley Twists — Glow Room Hair Ottawa"
+                loading="lazy"
+              />
+            </div>
+            <div class="gallery__item">
+              <img
+                src="images/IMAGLOWROOM-7.jpeg"
+                alt="Boho Braids femme — Glow Room Hair"
+                loading="lazy"
+              />
+            </div>
+            <div class="gallery__item">
+              <img
+                src="images/IMAGLOWROOM-3.jpeg"
+                alt="Cornrows hommes — Glow Room Hair Ottawa"
+                loading="lazy"
+              />
+            </div>
+            <div class="gallery__item">
+              <img
+                src="images/IMAGLOWROOM-4.jpeg"
+                alt="Twists hommes — Glow Room Hair"
+                loading="lazy"
+              />
+            </div>
+            <div class="gallery__item">
+              <img
+                src="images/IMAGLOWROOM-5.jpeg"
+                alt="Twists hommes — Glow Room Hair Ottawa"
+                loading="lazy"
+              />
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ──────────────────────────────────────────────────
          SERVICES — injecté par services.js via onPageEnter
          ────────────────────────────────────────────────── -->
-    <section id="services"   class="page" aria-label="Services et tarifs"></section>
+      <section
+        id="services"
+        class="page"
+        aria-label="Services et tarifs"
+      ></section>
 
-    <!-- ──────────────────────────────────────────────────
+      <!-- ──────────────────────────────────────────────────
          RÉSERVATION — injecté par booking.js via onPageEnter
          ────────────────────────────────────────────────── -->
-    <section id="reservation" class="page" aria-label="Réservation en ligne"></section>
+      <section
+        id="reservation"
+        class="page"
+        aria-label="Réservation en ligne"
+      ></section>
 
-    <!-- ──────────────────────────────────────────────────
+      <!-- ──────────────────────────────────────────────────
          AVIS — injecté par reviews.js via onPageEnter
          ────────────────────────────────────────────────── -->
-    <section id="avis"        class="page" aria-label="Avis clients"></section>
+      <section id="avis" class="page" aria-label="Avis clients"></section>
 
-    <!-- ──────────────────────────────────────────────────
+      <!-- ──────────────────────────────────────────────────
          POLITIQUES — contenu statique (pas de JS requis)
          ────────────────────────────────────────────────── -->
-    <section id="politiques" class="page" aria-labelledby="politiques-title">
-      <div class="container section">
+      <section id="politiques" class="page" aria-labelledby="politiques-title">
+        <div class="container section">
+          <header class="section-header">
+            <span class="section-header__eyebrow"
+              >À savoir avant de réserver</span
+            >
+            <h2 class="section-header__title" id="politiques-title">
+              Politiques du salon
+            </h2>
+            <div class="divider"></div>
+          </header>
 
-        <header class="section-header">
-          <span class="section-header__eyebrow">À savoir avant de réserver</span>
-          <h2 class="section-header__title" id="politiques-title">Politiques du salon</h2>
-          <div class="divider"></div>
-        </header>
+          <div class="grid grid--3">
+            <article>
+              <h3
+                class="text-brown"
+                style="
+                  font-family: var(--font-serif);
+                  font-size: var(--fs-md);
+                  margin-bottom: var(--space-md);
+                "
+              >
+                Dépôt de réservation
+              </h3>
+              <p
+                class="text-muted"
+                style="font-size: var(--fs-sm); line-height: 1.8"
+              >
+                Un dépôt de
+                <strong class="text-brown">15&nbsp;$&nbsp;CAD</strong> est
+                requis pour confirmer tout rendez-vous. Il est déduit de la
+                facture finale et est
+                <strong class="text-brown">non remboursable</strong>.
+              </p>
+            </article>
 
-        <div class="grid grid--3">
+            <article>
+              <h3
+                class="text-brown"
+                style="
+                  font-family: var(--font-serif);
+                  font-size: var(--fs-md);
+                  margin-bottom: var(--space-md);
+                "
+              >
+                Politique de retard
+              </h3>
+              <p
+                class="text-muted"
+                style="font-size: var(--fs-sm); line-height: 1.8"
+              >
+                Une grâce de <strong class="text-brown">15 minutes</strong> est
+                accordée. Au-delà, le rendez-vous peut être annulé et le dépôt
+                ne sera pas remboursé.
+              </p>
+            </article>
 
-          <article>
-            <h3 class="text-brown"
-              style="font-family:var(--font-serif);font-size:var(--fs-md);margin-bottom:var(--space-md);">
-              Dépôt de réservation
-            </h3>
-            <p class="text-muted" style="font-size:var(--fs-sm);line-height:1.8;">
-              Un dépôt de <strong class="text-brown">15&nbsp;$&nbsp;CAD</strong> est requis
-              pour confirmer tout rendez-vous. Il est déduit de la facture finale
-              et est <strong class="text-brown">non remboursable</strong>.
-            </p>
-          </article>
+            <article>
+              <h3
+                class="text-brown"
+                style="
+                  font-family: var(--font-serif);
+                  font-size: var(--fs-md);
+                  margin-bottom: var(--space-md);
+                "
+              >
+                Annulation
+              </h3>
+              <p
+                class="text-muted"
+                style="font-size: var(--fs-sm); line-height: 1.8"
+              >
+                Un préavis d'au moins
+                <strong class="text-brown">24 heures</strong> est obligatoire
+                pour toute annulation sans frais. Passé ce délai, le dépôt est
+                perdu.
+              </p>
+            </article>
+          </div>
 
-          <article>
-            <h3 class="text-brown"
-              style="font-family:var(--font-serif);font-size:var(--fs-md);margin-bottom:var(--space-md);">
-              Politique de retard
-            </h3>
-            <p class="text-muted" style="font-size:var(--fs-sm);line-height:1.8;">
-              Une grâce de <strong class="text-brown">15 minutes</strong> est accordée.
-              Au-delà, le rendez-vous peut être annulé et le dépôt
-              ne sera pas remboursé.
-            </p>
-          </article>
-
-          <article>
-            <h3 class="text-brown"
-              style="font-family:var(--font-serif);font-size:var(--fs-md);margin-bottom:var(--space-md);">
-              Annulation
-            </h3>
-            <p class="text-muted" style="font-size:var(--fs-sm);line-height:1.8;">
-              Un préavis d'au moins <strong class="text-brown">24 heures</strong> est
-              obligatoire pour toute annulation sans frais.
-              Passé ce délai, le dépôt est perdu.
-            </p>
-          </article>
-
+          <div class="info-box" style="margin-top: var(--space-xl)">
+            <span class="info-box__icon" aria-hidden="true">ℹ</span>
+            <span>
+              Les extensions ne sont <strong>pas incluses</strong> dans les prix
+              affichés. Pour toute question, contactez-nous au
+              <a
+                href="tel:416-836-4556"
+                style="color: var(--caramel); font-weight: 600"
+                >416-836-4556</a
+              >
+              ou par email à
+              <a href="mailto:Tinidk17@gmail.com" style="color: var(--caramel)"
+                >Tinidk17@gmail.com</a
+              >.
+            </span>
+          </div>
         </div>
+      </section>
 
-        <div class="info-box" style="margin-top:var(--space-xl);">
-          <span class="info-box__icon" aria-hidden="true">ℹ</span>
-          <span>
-            Les extensions ne sont <strong>pas incluses</strong> dans les prix affichés.
-            Pour toute question, contactez-nous au
-            <a href="tel:416-836-4556"
-               style="color:var(--caramel);font-weight:600;">416-836-4556</a>
-            ou par email à
-            <a href="mailto:Tinidk17@gmail.com"
-               style="color:var(--caramel);">Tinidk17@gmail.com</a>.
-          </span>
-        </div>
-
-      </div>
-    </section>
-
-    <!-- ──────────────────────────────────────────────────
+      <!-- ──────────────────────────────────────────────────
          CONTACT — injecté par contact.js via onPageEnter
          ────────────────────────────────────────────────── -->
-    <section id="contact" class="page" aria-label="Contact et horaires"></section>
+      <section
+        id="contact"
+        class="page"
+        aria-label="Contact et horaires"
+      ></section>
+    </main>
 
-  </main>
-
-  <!-- ════════════════════════════════════════════════════
+    <!-- ════════════════════════════════════════════════════
        FOOTER
        ════════════════════════════════════════════════════ -->
-  <footer class="footer" aria-label="Informations du salon">
-    <div class="container">
+    <footer class="footer" aria-label="Informations du salon">
+      <div class="container">
+        <div class="footer__grid">
+          <!-- Colonne 1 : Marque -->
+          <div>
+            <p class="footer__brand">
+              <img
+                src="images/logo-principal.webp"
+                alt="Glow Room Hair"
+                height="100"
+                style="
+                  height: 100px;
+                  width: auto;
+                  object-fit: contain;
+                  filter: brightness(1.1);
+                "
+              />
+            </p>
+            <p
+              style="
+                font-size: var(--fs-xs);
+                color: rgba(253, 248, 242, 0.4);
+                margin-top: var(--space-md);
+              "
+            >
+              Ottawa – Gatineau, Canada
+            </p>
+          </div>
 
-      <div class="footer__grid">
+          <!-- Colonne 2 : Navigation -->
+          <nav aria-label="Liens du pied de page">
+            <p class="footer__heading">Navigation</p>
+            <ul class="footer__list">
+              <li><a data-nav="accueil" href="/">Accueil</a></li>
+              <li>
+                <a data-nav="services" href="#services"
+                  >Services &amp; Tarifs</a
+                >
+              </li>
+              <li>
+                <a data-nav="reservation" href="#reservation">Réserver</a>
+              </li>
+              <li><a data-nav="avis" href="#avis">Avis clients</a></li>
+              <li>
+                <a data-nav="politiques" href="#politiques">Politiques</a>
+              </li>
+              <li><a data-nav="contact" href="#contact">Contact</a></li>
+            </ul>
+          </nav>
 
-        <!-- Colonne 1 : Marque -->
-        <div>
-          <p class="footer__brand">Glow <span>Room</span></p>
-          <p class="footer__tagline">
-            Salon spécialisé en tresses<br>et coiffures protectrices
+          <!-- Colonne 3 : Coordonnées -->
+          <div>
+            <p class="footer__heading">Nous contacter</p>
+            <ul class="footer__list">
+              <li>
+                <a
+                  href="tel:416-836-4556"
+                  aria-label="Téléphone et WhatsApp : 416-836-4556"
+                >
+                  📱&nbsp;416-836-4556
+                </a>
+              </li>
+              <li>
+                <a href="mailto:Tinidk17@gmail.com">
+                  ✉&nbsp;Tinidk17@gmail.com
+                </a>
+              </li>
+              <li>
+                <a
+                  href="https://instagram.com/glowroom.braids"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  aria-label="Instagram @glowroom.braids (nouvel onglet)"
+                >
+                  📸&nbsp;@glowroom.braids
+                </a>
+              </li>
+              <li>
+                <a
+                  href="https://snapchat.com/add/tini_dk"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  aria-label="Snapchat @tini_dk (nouvel onglet)"
+                >
+                  👻&nbsp;@tini_dk
+                </a>
+              </li>
+            </ul>
+          </div>
+        </div>
+
+        <!-- Barre de bas de page -->
+        <div class="footer__bottom">
+          <p class="footer__copy">
+            &copy; <span id="footer-year"></span> Glow Room Studio. Tous droits
+            réservés.
           </p>
-          <p style="font-size:var(--fs-xs);color:rgba(253,248,242,0.4);margin-top:var(--space-md);">
-            Ottawa – Gatineau, Canada
-          </p>
-        </div>
-
-        <!-- Colonne 2 : Navigation -->
-        <nav aria-label="Liens du pied de page">
-          <p class="footer__heading">Navigation</p>
-          <ul class="footer__list">
-            <li><a data-nav="accueil"     href="/">Accueil</a></li>
-            <li><a data-nav="services"    href="#services">Services &amp; Tarifs</a></li>
-            <li><a data-nav="reservation" href="#reservation">Réserver</a></li>
-            <li><a data-nav="avis"        href="#avis">Avis clients</a></li>
-            <li><a data-nav="politiques"  href="#politiques">Politiques</a></li>
-            <li><a data-nav="contact"     href="#contact">Contact</a></li>
-          </ul>
-        </nav>
-
-        <!-- Colonne 3 : Coordonnées -->
-        <div>
-          <p class="footer__heading">Nous contacter</p>
-          <ul class="footer__list">
-            <li>
-              <a href="tel:416-836-4556"
-                 aria-label="Téléphone et WhatsApp : 416-836-4556">
-                📱&nbsp;416-836-4556
-              </a>
-            </li>
-            <li>
-              <a href="mailto:Tinidk17@gmail.com">
-                ✉&nbsp;Tinidk17@gmail.com
-              </a>
-            </li>
-            <li>
-              <a href="https://instagram.com/glowroom.braids"
-                 target="_blank"
-                 rel="noopener noreferrer"
-                 aria-label="Instagram @glowroom.braids (nouvel onglet)">
-                📸&nbsp;@glowroom.braids
-              </a>
-            </li>
-            <li>
-              <a href="https://snapchat.com/add/tini_dk"
-                 target="_blank"
-                 rel="noopener noreferrer"
-                 aria-label="Snapchat @tini_dk (nouvel onglet)">
-                👻&nbsp;@tini_dk
-              </a>
-            </li>
-          </ul>
-        </div>
-
-      </div>
-
-      <!-- Barre de bas de page -->
-      <div class="footer__bottom">
-        <p class="footer__copy">
-          &copy; <span id="footer-year"></span> Glow Room Studio.
-          Tous droits réservés.
-        </p>
-        <div class="footer__socials">
-          <a class="footer__social-link"
-             href="https://instagram.com/glowroom.braids"
-             target="_blank"
-             rel="noopener noreferrer"
-             aria-label="Instagram (nouvel onglet)">Instagram</a>
-          <a class="footer__social-link"
-             href="https://snapchat.com/add/tini_dk"
-             target="_blank"
-             rel="noopener noreferrer"
-             aria-label="Snapchat (nouvel onglet)">Snapchat</a>
+          <div class="footer__socials">
+            <a
+              class="footer__social-link"
+              href="https://instagram.com/glowroom.braids"
+              target="_blank"
+              rel="noopener noreferrer"
+              aria-label="Instagram (nouvel onglet)"
+              >Instagram</a
+            >
+            <a
+              class="footer__social-link"
+              href="https://snapchat.com/add/tini_dk"
+              target="_blank"
+              rel="noopener noreferrer"
+              aria-label="Snapchat (nouvel onglet)"
+              >Snapchat</a
+            >
+          </div>
         </div>
       </div>
+    </footer>
 
-    </div>
-  </footer>
+    <!-- Copyright year — script synchrone minimal, s'exécute immédiatement -->
+    <script>
+      document.getElementById("footer-year").textContent =
+        new Date().getFullYear();
+    </script>
 
-  <!-- Copyright year — script synchrone minimal, s'exécute immédiatement -->
-  <script>document.getElementById('footer-year').textContent = new Date().getFullYear();</script>
-
-  <!-- Point d'entrée JS — type="module" implique defer automatiquement -->
-  <script type="module" src="js/main.js"></script>
-
-</body>
+    <!-- Point d'entrée JS — type="module" implique defer automatiquement -->
+    <script type="module" src="js/main.js"></script>
+  </body>
 </html>

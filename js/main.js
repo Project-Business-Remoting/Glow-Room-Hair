@@ -47,6 +47,7 @@ function _setupMobileMenu() {
   }
 
   function _close() {
+    document.activeElement.blur();
     toggle.classList.remove('is-active');
     menu.classList.remove('is-open');
     overlay?.classList.remove('is-open');

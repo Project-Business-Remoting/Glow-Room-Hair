@@ -23,15 +23,19 @@
 }
 
 .navbar__logo {
-  font-family: var(--font-serif);
-  font-size: var(--fs-lg);
-  font-weight: 700;
-  color: var(--brown);
-  letter-spacing: -0.01em;
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
   flex-shrink: 0;
 }
 
-.navbar__logo span { color: var(--caramel); }
+.navbar__logo-text {
+  font-family: var(--font-serif);
+  font-size: var(--fs-sm);
+  font-weight: 600;
+  color: var(--brown);
+  letter-spacing: 0.02em;
+}
 
 /* ── Bouton hamburger (mobile uniquement) ── */
 

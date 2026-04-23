@@ -3,15 +3,15 @@
 //  Glow Room Studio
 // ============================================================
 
-import { SERVICES_FEMMES, SERVICES_HOMMES, POLITIQUES } from './data.js';
-import { onPageEnter, navigate } from './router.js';
+import { POLITIQUES, SERVICES_FEMMES, SERVICES_HOMMES } from "./data.js";
+import { navigate, onPageEnter } from "./router.js";
 
 let _rendered = false;
 
 // ─── INIT ────────────────────────────────────────────────────
 
 export function initServices() {
-  onPageEnter('services', _onEnter);
+  onPageEnter("services", _onEnter);
 }
 
 // ─── PRIVATE ─────────────────────────────────────────────────
@@ -20,7 +20,7 @@ function _onEnter() {
   if (_rendered) return;
   _rendered = true;
 
-  const section = document.getElementById('services');
+  const section = document.getElementById("services");
   if (!section) return;
 
   section.innerHTML = _buildHTML();
@@ -64,7 +64,7 @@ function _buildHTML() {
         role="tabpanel"
         aria-labelledby="tab-femmes"
       >
-        ${SERVICES_FEMMES.map(s => _buildCard(s, 'femmes')).join('')}
+        ${SERVICES_FEMMES.map((s) => _buildCard(s, "femmes")).join("")}
       </div>
 
       <div
@@ -73,7 +73,7 @@ function _buildHTML() {
         role="tabpanel"
         aria-labelledby="tab-hommes"
       >
-        ${SERVICES_HOMMES.map(s => _buildCard(s, 'hommes')).join('')}
+        ${SERVICES_HOMMES.map((s) => _buildCard(s, "hommes")).join("")}
       </div>
 
       <div class="services-page__note">
@@ -87,33 +87,62 @@ function _buildHTML() {
 }
 
 function _buildCard(service, genre) {
+  const imageMap = {
+    "classiques-braids-f": "images/IMAGLOWROOM-6.jpeg",
+    "goddess-braids-f": "images/goddess-braids.jpg",
+    "french-curls-f": "images/french-curl.jpg",
+    "classiques-braids-h": "images/nattes.jpg",
+    "locks-retwist-h": "images/retwist.jpg",
+    "retwist-vanille-h": "images/IMAGLOWROOM-5.jpeg",
+  };
+  const altMap = {
+    "classiques-braids-f": "Classiques Braids — Knotless, Marley Twists",
+    "goddess-braids-f": "Goddess Braids — Boho Braids",
+    "french-curls-f": "French Curls — Glow Room Hair",
+    "classiques-braids-h": "Classiques Braids hommes — Cornrows",
+    "locks-retwist-h": "Locks Retwist hommes",
+    "retwist-vanille-h": "Retwist & Vanille hommes",
+  };
+  const photoHTML = imageMap[service.id]
+    ? `<div class="service-card__photo">
+        <img src="${imageMap[service.id]}"
+             alt="${altMap[service.id]}"
+             loading="lazy">
+      </div>`
+    : "";
+
   const stylesTags = service.styles?.length
     ? `<div class="service-card__styles" aria-label="Styles proposés">
-        ${service.styles.map(s => `<span class="service-card__style-tag">${s}</span>`).join('')}
+        ${service.styles.map((s) => `<span class="service-card__style-tag">${s}</span>`).join("")}
       </div>`
-    : '';
+    : "";
 
-  const variants = service.variantes.map(v => `
+  const variants = service.variantes
+    .map(
+      (v) => `
     <div
       class="service-card__variant"
       role="button"
       tabindex="0"
-      aria-label="Réserver ${service.categorie} – ${v.label} ${v.prixLabel ?? v.prix + '$'}"
+      aria-label="Réserver ${service.categorie} – ${v.label} ${v.prixLabel ?? v.prix + "$"}"
       data-variant-id="${v.id}"
       data-service-id="${service.id}"
       data-categorie="${service.categorie}"
       data-label="${v.label}"
-      data-prix="${v.prix ?? ''}"
-      data-prix-label="${v.prixLabel ?? v.prix + '$'}"
+      data-prix="${v.prix ?? ""}"
+      data-prix-label="${v.prixLabel ?? v.prix + "$"}"
       data-genre="${genre}"
     >
       <span class="service-card__variant-label">${v.label}</span>
-      <span class="service-card__variant-price">${v.prixLabel ?? v.prix + '$'}</span>
+      <span class="service-card__variant-price">${v.prixLabel ?? v.prix + "$"}</span>
     </div>
-  `).join('');
+  `,
+    )
+    .join("");
 
   return `
     <article class="service-card" data-service-id="${service.id}">
+      ${photoHTML}
       <h3 class="service-card__title">${service.categorie}</h3>
       ${stylesTags}
       <div class="service-card__variants">${variants}</div>
@@ -123,54 +152,60 @@ function _buildCard(service, genre) {
 
 function _bindEvents(section) {
   // Onglets Femmes / Hommes
-  section.querySelector('.services-tabs').addEventListener('click', e => {
-    const tab = e.target.closest('[data-tab]');
-    if (!tab || tab.classList.contains('is-active')) return;
+  section.querySelector(".services-tabs").addEventListener("click", (e) => {
+    const tab = e.target.closest("[data-tab]");
+    if (!tab || tab.classList.contains("is-active")) return;
 
     const genre = tab.dataset.tab;
 
-    section.querySelectorAll('.services-tab').forEach(t => {
-      t.classList.toggle('is-active', t.dataset.tab === genre);
-      t.setAttribute('aria-selected', String(t.dataset.tab === genre));
+    section.querySelectorAll(".services-tab").forEach((t) => {
+      t.classList.toggle("is-active", t.dataset.tab === genre);
+      t.setAttribute("aria-selected", String(t.dataset.tab === genre));
     });
 
-    section.querySelectorAll('.services-panel').forEach(p => {
-      p.classList.toggle('is-active', p.id === `panel-${genre}`);
+    section.querySelectorAll(".services-panel").forEach((p) => {
+      p.classList.toggle("is-active", p.id === `panel-${genre}`);
     });
   });
 
   // Clic sur une variante → pré-sélection + navigation vers le tunnel
-  section.addEventListener('click', e => {
-    const variant = e.target.closest('.service-card__variant');
+  section.addEventListener("click", (e) => {
+    const variant = e.target.closest(".service-card__variant");
     if (!variant) return;
 
     // Effacer la sélection précédente dans tous les panels
-    section.querySelectorAll('.service-card__variant.is-selected')
-      .forEach(v => v.classList.remove('is-selected'));
+    section
+      .querySelectorAll(".service-card__variant.is-selected")
+      .forEach((v) => v.classList.remove("is-selected"));
 
-    variant.classList.add('is-selected');
-    variant.closest('.service-card')?.classList.add('is-selected');
+    variant.classList.add("is-selected");
+    variant.closest(".service-card")?.classList.add("is-selected");
 
     // Transmettre la sélection à booking.js via événement personnalisé
-    document.dispatchEvent(new CustomEvent('app:service-selected', {
-      detail: {
-        serviceId:  variant.dataset.serviceId,
-        variantId:  variant.dataset.variantId,
-        categorie:  variant.dataset.categorie,
-        label:      variant.dataset.label,
-        prix:       variant.dataset.prix ? Number(variant.dataset.prix) : null,
-        prixLabel:  variant.dataset.prixLabel,
-        genre:      variant.dataset.genre,
-      },
-    }));
+    document.dispatchEvent(
+      new CustomEvent("app:service-selected", {
+        detail: {
+          serviceId: variant.dataset.serviceId,
+          variantId: variant.dataset.variantId,
+          categorie: variant.dataset.categorie,
+          label: variant.dataset.label,
+          prix: variant.dataset.prix ? Number(variant.dataset.prix) : null,
+          prixLabel: variant.dataset.prixLabel,
+          genre: variant.dataset.genre,
+        },
+      }),
+    );
 
-    navigate('reservation');
+    navigate("reservation");
   });
 
   // Accessibilité : Entrée/Espace déclenchent le clic sur les variantes
-  section.addEventListener('keydown', e => {
-    if (e.key !== 'Enter' && e.key !== ' ') return;
-    const variant = e.target.closest('.service-card__variant');
-    if (variant) { e.preventDefault(); variant.click(); }
+  section.addEventListener("keydown", (e) => {
+    if (e.key !== "Enter" && e.key !== " ") return;
+    const variant = e.target.closest(".service-card__variant");
+    if (variant) {
+      e.preventDefault();
+      variant.click();
+    }
   });
 }
