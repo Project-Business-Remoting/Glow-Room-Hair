@@ -137,12 +137,21 @@ export const SERVICES = {
 // via 'manuel' : instructions envoyées par email après réservation
 
 export const METHODES_PAIEMENT = [
-  { id: 'card',              label: 'Carte bancaire',    via: 'stripe', actif: true  },
-  { id: 'apple-pay',         label: 'Apple Pay',         via: 'stripe', actif: true  },
-  { id: 'google-pay',        label: 'Google Pay',        via: 'stripe', actif: true  },
-  { id: 'interac-online',    label: 'Interac Online',    via: 'stripe', actif: true  },
-  { id: 'interac-etransfer', label: 'Interac e-Transfer',via: 'manuel', actif: true,
-    note: 'Instructions de transfert envoyées par email' },
+  {
+    id: 'stripe',
+    label: 'Payer en ligne',
+    description: 'Carte bancaire, Apple Pay, Interac Debit',
+    via: 'stripe',
+    actif: true,
+  },
+  {
+    id: 'interac-etransfer',
+    label: 'Interac e-Transfer',
+    description: 'Virement manuel — confirmation par le salon',
+    via: 'manuel',
+    actif: true,
+    note: `Envoyez 15$ à ${SALON.email} avec la référence "RDV + votre nom". Le salon confirmera par email sous 24h.`,
+  },
 ];
 
 // ─── AVIS CLIENTS ───────────────────────────────────────────

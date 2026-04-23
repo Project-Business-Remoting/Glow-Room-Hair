@@ -304,16 +304,17 @@ function _buildS3() {
 
 // S4 — Dépôt & Méthode de paiement
 function _buildS4() {
+  const isInterac = B.paymentMethod === 'interac-etransfer';
+  const interac   = METHODES_PAIEMENT.find(m => m.id === 'interac-etransfer');
+  const btnLabel  = isInterac
+    ? 'Confirmer ma réservation'
+    : `Procéder au paiement — ${POLITIQUES.depot.montant}$`;
+
   return `
     <h2 class="booking-step__title">Dépôt de réservation</h2>
     <p class="booking-step__subtitle">
-      Choisissez votre méthode de paiement pour verser le dépôt.
+      Choisissez votre méthode de paiement pour verser le dépôt de ${POLITIQUES.depot.montant}$.
     </p>
-
-    <div class="deposit-info">
-      <p class="deposit-info__amount">${POLITIQUES.depot.montant} CAD</p>
-      <p class="deposit-info__text">${POLITIQUES.depot.description}</p>
-    </div>
 
     <div class="payment-methods" role="radiogroup" aria-label="Choisir une méthode de paiement">
       ${METHODES_PAIEMENT.filter(m => m.actif).map(m => `
@@ -326,16 +327,22 @@ function _buildS4() {
           <span class="payment-method__radio"></span>
           <span>
             <span class="payment-method__label">${m.label}</span>
-            ${m.note ? `<span class="payment-method__note">${m.note}</span>` : ''}
+            ${m.description ? `<span class="payment-method__note">${m.description}</span>` : ''}
           </span>
         </button>`).join('')}
     </div>
+
+    ${isInterac && interac?.note ? `
+    <div class="info-box" style="margin-top:var(--space-md)">
+      <span class="info-box__icon">ℹ</span>
+      <span>${interac.note}</span>
+    </div>` : ''}
 
     <div class="booking-nav">
       <button type="button" class="btn-back" data-action="prev">Retour</button>
       <button type="button" class="btn btn-gold btn--lg" data-action="pay"
         ${!B.paymentMethod ? 'disabled aria-disabled="true"' : ''}>
-        Payer ${POLITIQUES.depot.montant}$ — Confirmer
+        ${btnLabel}
       </button>
     </div>`;
 }
@@ -343,24 +350,27 @@ function _buildS4() {
 // S5 — Confirmation
 function _buildS5() {
   const ref = _generateRef();
+  const isInterac = B.paymentMethod === 'interac-etransfer';
+
   const recap = [
-    { label: 'Service',    value: `${B.service?.categorie} — ${B.service?.label}` },
-    { label: 'Date',       value: _formatDateFR(B.date) },
-    { label: 'Heure',      value: B.time },
-    { label: 'Nom',        value: B.name },
-    { label: 'Email',      value: B.email },
-    { label: 'Dépôt payé', value: `${POLITIQUES.depot.montant}$` },
-    { label: 'Référence',  value: ref },
+    { label: 'Service',                                     value: `${B.service?.categorie} — ${B.service?.label}` },
+    { label: 'Date',                                        value: _formatDateFR(B.date) },
+    { label: 'Heure',                                       value: B.time },
+    { label: 'Nom',                                         value: B.name },
+    { label: 'Email',                                       value: B.email },
+    { label: isInterac ? 'Dépôt à envoyer' : 'Dépôt payé', value: `${POLITIQUES.depot.montant}$` },
+    { label: 'Référence',                                   value: ref },
   ];
+
+  const message = isInterac
+    ? `Votre réservation est enregistrée. Effectuez le virement Interac de ${POLITIQUES.depot.montant}$ pour confirmer.`
+    : `Un email de confirmation a été envoyé à <strong>${_esc(B.email)}</strong>. Merci de vous présenter avec un délai de grâce de ${POLITIQUES.retard.graceMinutes} minutes maximum.`;
 
   return `
     <div class="booking-confirmation">
       <div class="booking-confirmation__icon">✅</div>
       <h2 class="booking-confirmation__title">Rendez-vous confirmé !</h2>
-      <p class="booking-confirmation__text">
-        Un email de confirmation a été envoyé à <strong>${_esc(B.email)}</strong>.
-        Merci de vous présenter avec un délai de grâce de ${POLITIQUES.retard.graceMinutes} minutes maximum.
-      </p>
+      <p class="booking-confirmation__text">${message}</p>
 
       <div class="booking-confirmation__recap">
         ${recap.map(({ label, value }) => `
@@ -497,49 +507,44 @@ function _handleSlotSelect(root, slot) {
 
 function _handlePaymentSelect(root, methodId) {
   B.paymentMethod = methodId;
-  root.querySelectorAll('[data-payment-method]').forEach(m => {
-    const sel = m.dataset.paymentMethod === methodId;
-    m.classList.toggle('is-selected', sel);
-    m.setAttribute('aria-checked', String(sel));
-  });
-  const payBtn = root.querySelector('[data-action="pay"]');
-  if (payBtn) { payBtn.disabled = false; payBtn.removeAttribute('aria-disabled'); }
+  _renderStep(B.step);
 }
 
 async function _handlePayment(root) {
   if (!B.paymentMethod) return;
+
+  if (B.paymentMethod === 'interac-etransfer') {
+    _goToStep(5);
+    return;
+  }
+
   const btn = root.querySelector('[data-action="pay"]');
   if (btn) { btn.disabled = true; btn.textContent = 'Traitement en cours…'; }
 
   try {
-    // TODO: Décommenter quand le backend est prêt (Render / Railway)
-    //
-    // const res = await fetch('/create-checkout-session', {
-    //   method: 'POST',
-    //   headers: { 'Content-Type': 'application/json' },
-    //   body: JSON.stringify({
-    //     service:       B.service,
-    //     date:          B.date,
-    //     time:          B.time,
-    //     name:          B.name,
-    //     phone:         B.phone,
-    //     email:         B.email,
-    //     paymentMethod: B.paymentMethod,
-    //   }),
-    // });
-    // if (!res.ok) throw new Error(await res.text());
-    // const { sessionUrl } = await res.json();
-    // if (sessionUrl) { window.location.href = sessionUrl; return; } // → Stripe Checkout
-    //
-    await new Promise(r => setTimeout(r, 1200)); // stub
-    _goToStep(5);
+    const BACKEND_URL = 'http://localhost:3000';
+
+    const res = await fetch(`${BACKEND_URL}/create-checkout-session`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        clientName: B.name,
+        service:    `${B.service.categorie} — ${B.service.label}`,
+        date:       B.date,
+        time:       B.time,
+      }),
+    });
+
+    if (!res.ok) throw new Error(await res.text());
+    const { url } = await res.json();
+    if (url) { window.location.href = url; return; }
   } catch (err) {
     console.error('[booking] Erreur paiement :', err);
     _toast('Une erreur est survenue. Veuillez réessayer.', 'error');
     if (btn) {
       btn.disabled = false;
       btn.removeAttribute('aria-disabled');
-      btn.textContent = `Payer ${POLITIQUES.depot.montant}$ — Confirmer`;
+      btn.textContent = `Procéder au paiement — ${POLITIQUES.depot.montant}$`;
     }
   }
 }
