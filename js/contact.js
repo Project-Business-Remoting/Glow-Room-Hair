@@ -200,8 +200,14 @@ function _bindForm(form) {
     _setSubmitting(form, true);
 
     try {
-      // TODO: remplacer par fetch() vers POST /contact (backend Render/Railway)
-      await _simulateSubmit();
+      const BACKEND_URL = 'https://glow-room-backend.onrender.com';
+
+      const res = await fetch(`${BACKEND_URL}/contact`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(data),
+      });
+      if (!res.ok) throw new Error('Erreur serveur');
 
       form.reset();
       document.dispatchEvent(new CustomEvent('app:toast', {
@@ -267,7 +273,3 @@ function _resetForm(form) {
   _setSubmitting(form, false);
 }
 
-// Simule un appel réseau — à supprimer quand le backend est branché
-function _simulateSubmit() {
-  return new Promise(resolve => setTimeout(resolve, 900));
-}

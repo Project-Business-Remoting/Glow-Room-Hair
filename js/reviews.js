@@ -49,6 +49,18 @@ function _buildHTML() {
       <div class="reviews-grid" role="list" aria-label="Liste des avis clients">
         ${sorted.map(_buildCard).join('')}
       </div>
+
+      <div style="text-align:center;margin-top:var(--space-2xl);">
+        <p style="color:var(--muted);font-size:var(--fs-sm);margin-bottom:var(--space-md);">
+          Vous avez visité Glow Room Hair ? Partagez votre expérience !
+        </p>
+        <a href="https://www.instagram.com/glowroom.braids"
+           target="_blank"
+           rel="noopener noreferrer"
+           class="btn btn-ghost">
+          Nous taguer sur Instagram
+        </a>
+      </div>
     </div>
   `;
 }
