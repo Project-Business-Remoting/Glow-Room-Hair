@@ -367,11 +367,16 @@ function _buildS4Success() {
       <h2 class="booking-confirmation__title">Demande envoyée !</h2>
       <p class="booking-confirmation__text">
         Un email avec les instructions Interac a été envoyé à
-        <strong>${_esc(B.email)}</strong>.<br>
-        Votre rendez-vous sera confirmé dès réception du paiement.
+        <strong>${_esc(B.email)}</strong>.
       </p>
+      <div class="info-box" style="margin-top:var(--space-md); text-align:left;">
+        <span class="info-box__icon">⚠️</span>
+        <span>
+          <strong>Vous avez 15 minutes</strong> pour envoyer le virement Interac. Passé ce délai, le créneau sera annulé.
+        </span>
+      </div>
       <p class="booking-confirmation__text"
-        style="margin-top:var(--space-sm);font-size:var(--fs-sm);color:var(--muted);">
+        style="margin-top:var(--space-md);font-size:var(--fs-sm);color:var(--muted);">
         Référence : ${_esc(ref)}
       </p>
       <div style="display:flex;flex-wrap:wrap;gap:var(--space-md);justify-content:center;margin-top:var(--space-xl);">

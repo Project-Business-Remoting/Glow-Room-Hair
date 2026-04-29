@@ -27,6 +27,7 @@ let _calYear = null;
 let _calMonth = null; // 0-indexed
 let _selectedDate = null; // YYYY-MM-DD
 let _monthCounts = new Map(); // Map<YYYY-MM-DD, count>
+let _currentListMode = { type: 'date', value: null };
 
 export function initAdmin() {
   onPageEnter("admin", _onEnter);
@@ -364,6 +365,7 @@ async function _loadMonthCounts() {
 }
 
 async function _loadReservationsForDate(root, date) {
+  _currentListMode = { type: 'date', value: date };
   const listEl = root.querySelector("#admin-list");
   if (!listEl) return;
   listEl.innerHTML = `<p style="font-size:var(--fs-sm);color:var(--muted);">Chargement…</p>`;
@@ -405,6 +407,7 @@ async function _loadReservationsForDate(root, date) {
 }
 
 async function _loadReservations(root, range) {
+  _currentListMode = { type: 'range', value: range };
   const listEl = root.querySelector("#admin-list");
   if (!listEl) return;
 
@@ -502,12 +505,23 @@ function _renderReservationCard(r) {
 async function _patchReservation(id, action) {
   if (!id) return;
 
+  let body = null;
+  if (action === "annuler") {
+    const reason = prompt("Raison de l'annulation (sera envoyée au client) :\nLaissez vide pour la raison par défaut (Délai de paiement dépassé).", "Délai de paiement de 15 minutes dépassé.");
+    if (reason === null) return; // L'utilisateur a cliqué sur Annuler dans le prompt
+    if (reason.trim()) body = JSON.stringify({ reason: reason.trim() });
+  }
+
   try {
+    const headers = _adminHeaders();
+    if (body) headers["Content-Type"] = "application/json";
+
     const res = await fetch(
       `${BACKEND_URL}/reservation/${encodeURIComponent(id)}/${action}`,
       {
         method: "PATCH",
-        headers: _adminHeaders(),
+        headers,
+        body,
       },
     );
 
@@ -528,7 +542,13 @@ async function _patchReservation(id, action) {
     );
 
     const root = document.getElementById("admin-root");
-    if (root) _loadReservations(root, "today");
+    if (root) {
+      if (_currentListMode.type === 'range') {
+        _loadReservations(root, _currentListMode.value);
+      } else {
+        _loadReservationsForDate(root, _currentListMode.value || _selectedDate);
+      }
+    }
   } catch (err) {
     console.error("[admin] patchReservation:", err);
     _toast("Action impossible. Réessayez.", "error");
