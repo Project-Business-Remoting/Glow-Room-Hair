@@ -63,9 +63,9 @@ export const SERVICES_FEMMES = [
     categorie: 'Classiques Braids',
     styles: ['Marley Twists', 'Fausse Locks', 'Knotless Braids', 'Kinky Twist'],
     variantes: [
-      { id: 'cl-f-epaules', label: 'Épaules',    prix: 80  },
-      { id: 'cl-f-mi-dos',  label: 'Mi-dos',     prix: 100 },
-      { id: 'cl-f-bas-dos', label: 'Bas du dos', prix: 110 },
+      { id: 'cl-f-epaules', label: 'Épaules',    prix: 80,  dureeMinutes: 240 },
+      { id: 'cl-f-mi-dos',  label: 'Mi-dos',     prix: 100, dureeMinutes: 360 },
+      { id: 'cl-f-bas-dos', label: 'Bas du dos', prix: 110, dureeMinutes: 420 },
     ],
   },
   {
@@ -73,9 +73,9 @@ export const SERVICES_FEMMES = [
     categorie: 'Goddess Braids',
     styles: ['Boho Braids', 'Bora Bora Braids'],
     variantes: [
-      { id: 'god-f-epaules', label: 'Épaules',    prix: 90  },
-      { id: 'god-f-mi-dos',  label: 'Mi-dos',     prix: 110 },
-      { id: 'god-f-bas-dos', label: 'Bas du dos', prix: 120 },
+      { id: 'god-f-epaules', label: 'Épaules',    prix: 90,  dureeMinutes: 360 },
+      { id: 'god-f-mi-dos',  label: 'Mi-dos',     prix: 110, dureeMinutes: 420 },
+      { id: 'god-f-bas-dos', label: 'Bas du dos', prix: 120, dureeMinutes: 480 },
     ],
   },
   {
@@ -83,9 +83,9 @@ export const SERVICES_FEMMES = [
     categorie: 'French Curls',
     styles: [],
     variantes: [
-      { id: 'fc-f-epaules', label: 'Épaules',    prix: 100 },
-      { id: 'fc-f-mi-dos',  label: 'Mi-dos',     prix: 120 },
-      { id: 'fc-f-bas-dos', label: 'Bas du dos', prix: 140 },
+      { id: 'fc-f-epaules', label: 'Épaules',    prix: 100, dureeMinutes: 360 },
+      { id: 'fc-f-mi-dos',  label: 'Mi-dos',     prix: 120, dureeMinutes: 450 },
+      { id: 'fc-f-bas-dos', label: 'Bas du dos', prix: 140, dureeMinutes: 510 },
     ],
   },
 ];
@@ -99,28 +99,28 @@ export const SERVICES_HOMMES = [
     id: 'classiques-braids-h',
     categorie: 'Classiques Braids',
     variantes: [
-      { id: 'cl-h-nattes',     label: 'Nattes',     prix: null, prixRange: [50, 70], prixLabel: '50 – 70$' },
-      { id: 'cl-h-twist',      label: 'Twist',      prix: 70,   prixRange: null,     prixLabel: '70$' },
-      { id: 'cl-h-box-braids', label: 'Box Braids', prix: 75,   prixRange: null,     prixLabel: '75$' },
-      { id: 'cl-h-flat-twist', label: 'Flat Twist', prix: 85,   prixRange: null,     prixLabel: '85$' },
+      { id: 'cl-h-nattes',     label: 'Nattes',     prix: null, prixRange: [50, 70], prixLabel: '50 – 70$', dureeMinutes: 120 },
+      { id: 'cl-h-twist',      label: 'Twist',      prix: 70,   prixRange: null,     prixLabel: '70$',      dureeMinutes: 150 },
+      { id: 'cl-h-box-braids', label: 'Box Braids', prix: 75,   prixRange: null,     prixLabel: '75$',      dureeMinutes: 180 },
+      { id: 'cl-h-flat-twist', label: 'Flat Twist', prix: 85,   prixRange: null,     prixLabel: '85$',      dureeMinutes: 180 },
     ],
   },
   {
     id: 'locks-retwist-h',
     categorie: 'Locks (Retwist)',
     variantes: [
-      { id: 'lk-h-40-60',  label: '40 – 60 locks',  prix: 70,  prixRange: null, prixLabel: '70$'  },
-      { id: 'lk-h-61-80',  label: '61 – 80 locks',  prix: 90,  prixRange: null, prixLabel: '90$'  },
-      { id: 'lk-h-81-100', label: '81 – 100 locks', prix: 110, prixRange: null, prixLabel: '110$' },
+      { id: 'lk-h-40-60',  label: '40 – 60 locks',  prix: 70,  prixRange: null, prixLabel: '70$',  dureeMinutes: 240 },
+      { id: 'lk-h-61-80',  label: '61 – 80 locks',  prix: 90,  prixRange: null, prixLabel: '90$',  dureeMinutes: 240 },
+      { id: 'lk-h-81-100', label: '81 – 100 locks', prix: 110, prixRange: null, prixLabel: '110$', dureeMinutes: 240 },
     ],
   },
   {
     id: 'retwist-vanille-h',
     categorie: 'Retwist & Vanille',
     variantes: [
-      { id: 'rv-h-40-60',  label: '40 – 60 locks',  prix: 90,  prixRange: null, prixLabel: '90$'  },
-      { id: 'rv-h-61-80',  label: '61 – 80 locks',  prix: 110, prixRange: null, prixLabel: '110$' },
-      { id: 'rv-h-81-100', label: '81 – 100 locks', prix: 130, prixRange: null, prixLabel: '130$' },
+      { id: 'rv-h-40-60',  label: '40 – 60 locks',  prix: 90,  prixRange: null, prixLabel: '90$',  dureeMinutes: 300 },
+      { id: 'rv-h-61-80',  label: '61 – 80 locks',  prix: 110, prixRange: null, prixLabel: '110$', dureeMinutes: 300 },
+      { id: 'rv-h-81-100', label: '81 – 100 locks', prix: 130, prixRange: null, prixLabel: '130$', dureeMinutes: 360 },
     ],
   },
 ];
@@ -131,26 +131,23 @@ export const SERVICES = {
   hommes: SERVICES_HOMMES,
 };
 
+// ─── CRÉNEAUX ────────────────────────────────────────────────
+// Toute prestation >= SEUIL_GRISAGE_16H minutes → créneau 16h grisé
+
+export const SEUIL_GRISAGE_16H = 360; // 6h en minutes
+
 // ─── MÉTHODES DE PAIEMENT ───────────────────────────────────
-// Étape 4 du tunnel de réservation
-// via 'stripe' : géré automatiquement par Stripe Checkout
+// Méthode unique : Interac e-Transfer manuel
 // via 'manuel' : instructions envoyées par email après réservation
 
 export const METHODES_PAIEMENT = [
   {
-    id: 'stripe',
-    label: 'Payer en ligne',
-    description: 'Carte bancaire, Apple Pay, Interac Debit',
-    via: 'stripe',
-    actif: true,
-  },
-  {
-    id: 'interac-etransfer',
+    id: 'interac',
     label: 'Interac e-Transfer',
-    description: 'Virement manuel — confirmation par le salon',
+    description: 'Virement bancaire canadien — simple et sécurisé',
     via: 'manuel',
     actif: true,
-    note: `Envoyez 15$ à ${SALON.email} avec la référence "RDV + votre nom". Le salon confirmera par email sous 24h.`,
+    instructions: `Envoyez 15$ CAD à ${SALON.email} via Interac e-Transfer. Utilisez votre nom complet comme message. Votre réservation sera confirmée dès réception.`,
   },
 ];
 
