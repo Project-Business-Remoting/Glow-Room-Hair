@@ -234,7 +234,8 @@ async function _renderDashboard(root) {
 
 async function _smtpTest() {
   try {
-    const res = await fetch(`${BACKEND_URL}/admin/smtp-status`, {
+    const res = await fetch(`${BACKEND_URL}/admin/test-email`, {
+      method: "POST",
       headers: _adminHeaders(),
     });
     if (!res.ok) {
@@ -245,20 +246,11 @@ async function _smtpTest() {
       }
       throw new Error(await res.text());
     }
-    const data = await res.json();
-    const smtp = data?.smtp;
-    if (!smtp?.configured) {
-      _toast("Email: variables manquantes côté backend.", "error");
-      return;
-    }
-    if (smtp.ok) {
-      _toast(`SMTP OK (${smtp.host}:${smtp.port}).`, "success");
-      return;
-    }
-    _toast(`SMTP KO: ${smtp.error || "Erreur"}`, "error");
+
+    _toast("Email de test envoyé.", "success");
   } catch (err) {
     console.error("[admin] smtpTest:", err);
-    _toast("Test SMTP impossible.", "error");
+    _toast("Envoi test impossible (voir logs backend).", "error");
   }
 }
 
