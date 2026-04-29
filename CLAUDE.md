@@ -27,18 +27,17 @@ par le cahier des charges.
 ### Backend
 
 - **Node.js 18+ LTS** + **Express.js 4.x**
-- **MongoDB + Mongoose 7.x** (ou Firebase — à confirmer)
-- **Stripe SDK** (latest) pour paiements et webhooks
+- **Firebase Admin / Firestore** (réservations + créneaux bloqués)
 - **Nodemailer 6.x** pour emails
 - Architecture MVC légère : routes / controllers / models / services / middlewares
 
 ### Paiement
 
-- **Stripe Checkout** — dépôt de 15$ non remboursable
-- Méthodes acceptées : Carte bancaire, Apple Pay, Google Pay, Interac Online
-- Interac e-Transfer : manuel (secondaire/optionnel)
-- **JAMAIS valider une réservation sans vérification du webhook Stripe signé**
-- Variables d'environnement obligatoires : STRIPE_SECRET_KEY, STRIPE_WEBHOOK_SECRET
+- Stripe supprimé complètement
+- Méthode unique : Interac e-Transfer manuel
+- Dépôt 15$ envoyé à Tinidk17@gmail.com
+- Confirmation manuelle par la propriétaire via dashboard
+- Statuts réservation : en_attente → confirmé → annulé
 
 ### Hébergement
 
@@ -64,9 +63,10 @@ glow-room-hair/
 │   ├── data.js             ← SOURCE UNIQUE des données (services, horaires, avis)
 │   ├── router.js           ← Navigation entre pages (show/hide)
 │   ├── services.js         ← Affichage catalogue services
-│   ├── booking.js          ← Tunnel de réservation 6 étapes + appel Stripe
+│   ├── booking.js          ← Tunnel de réservation 5 étapes + appel backend (Interac)
 │   ├── reviews.js          ← Affichage avis clients
 │   ├── contact.js          ← Formulaire + horaires
+│   ├── admin.js            ← Dashboard admin (confirmer/annuler/bloquer créneaux)
 │   └── main.js             ← Init globale, toast, utilitaires
 ├── images/                 ← Photos optimisées (WebP)
 ├── robots.txt
@@ -81,33 +81,32 @@ glow-room-backend/
 ├── .env                    ← JAMAIS committé
 ├── .env.example            ← Template variables requises
 ├── routes/
-│   ├── checkout.js         ← POST /create-checkout-session
-│   ├── webhook.js          ← POST /webhook
-│   └── reservation.js      ← GET /reservation/:id
+│   ├── reservation.js      ← POST /reservation + GET slots + PATCH admin
+│   ├── admin.js            ← GET /admin/reservations (protégé)
+│   └── blockedSlots.js     ← POST /bloquer-creneau (protégé)
 ├── controllers/
-│   ├── checkoutController.js
-│   ├── webhookController.js
 │   └── reservationController.js
-├── models/
-│   └── Reservation.js      ← Schéma Mongoose
 ├── services/
-│   ├── stripeService.js
-│   └── emailService.js
+│   ├── firebase.js         ← Init Firebase Admin
+│   ├── reservationModel.js ← Accès Firestore
+│   └── email.js            ← Emails (Interac + confirmations)
 └── middlewares/
-    ├── errorHandler.js
-    └── validateReservation.js
+  └── requireAdmin.js     ← Protège les routes admin
 ```
 
 ---
 
 ## API REST — Endpoints
 
-| Méthode | Endpoint                 | Rôle                                             |
-| ------- | ------------------------ | ------------------------------------------------ |
-| POST    | /create-checkout-session | Crée session Stripe + retourne URL               |
-| POST    | /webhook                 | Reçoit événements Stripe (signature obligatoire) |
-| POST    | /reservation             | Enregistre réservation après webhook confirmé    |
-| GET     | /reservation/:id         | Récupère réservation par ID                      |
+| Méthode | Endpoint                           | Rôle                                                  |
+| ------- | ---------------------------------- | ----------------------------------------------------- |
+| GET     | /slots-disponibles?date=YYYY-MM-DD | Retourne les créneaux occupés/bloqués pour une date   |
+| POST    | /reservation                       | Crée une demande de réservation (statut `en_attente`) |
+| GET     | /reservation/:id                   | Récupère une réservation par ID                       |
+| PATCH   | /reservation/:id/confirmer         | Admin : confirme (statut `confirmé`) + email cliente  |
+| PATCH   | /reservation/:id/annuler           | Admin : annule (statut `annulé`) + email cliente      |
+| POST    | /bloquer-creneau                   | Admin : bloque un créneau (ex: 16:00) pour une date   |
+| GET     | /admin/reservations?start&end      | Admin : liste les réservations sur une période        |
 
 ---
 
@@ -197,18 +196,29 @@ _Extensions non incluses dans tous les prix._
 
 ---
 
-## Tunnel de réservation (6 étapes)
+## Tunnel de réservation
 
-| Étape | Nom           | Fonction JS | Validation                                    |
-| ----- | ------------- | ----------- | --------------------------------------------- |
-| 0     | Bienvenue     | renderS0()  | Aucune                                        |
-| 1     | Choix service | renderS1()  | service !== null                              |
-| 2     | Date & Heure  | renderS2()  | date && time                                  |
-| 3     | Informations  | renderS3()  | nom + tel + email valides                     |
-| 4     | Dépôt         | renderS4()  | paymentMethod + POST /create-checkout-session |
-| 5     | Confirmation  | renderS5()  | Réservation enregistrée en base               |
+- 5 étapes : Bienvenue → Service → Date/Heure → Infos → Confirmation
+- Deux créneaux fixes par jour : 9h00 et 16h00
+- Créneau 16h grisé automatiquement si durée prestation > 6h
+- Durées par prestation dans data.js (champ dureeMinutes)
+- Réservation enregistrée en Firebase avec statut 'en_attente'
+- Email automatique avec instructions Interac envoyé à la cliente
+- Pas de redirection vers une page de paiement
 
-L'état global du tunnel est géré dans un objet central `B` (ou `bookingState`) dans `booking.js`.
+---
+
+## Dashboard admin
+
+- URL : /#admin (page protégée)
+- Authentification : mot de passe simple stocké en variable d'environnement
+- Fonctionnalités :
+  - Liste des réservations (aujourd'hui / semaine / toutes)
+  - Bouton "Confirmer paiement" par réservation → statut confirmé + email cliente
+  - Bouton "Annuler" par réservation → statut annulé + email cliente
+  - Bouton "Bloquer créneau 16h" par jour
+- Déployé sur Vercel avec le frontend (page #admin)
+- Appels API vers le backend Render
 
 ---
 
@@ -242,11 +252,9 @@ L'état global du tunnel est géré dans un objet central `B` (ou `bookingState`
 
 ## Sécurité — RÈGLES ABSOLUES
 
-- `.env` jamais committé sur GitHub — contient les clés Stripe et DB
-- Clé secrète Stripe **uniquement** dans les variables d'environnement
-- Webhook vérifié via `stripe.webhooks.constructEvent()` + STRIPE_WEBHOOK_SECRET
-- Aucune réservation créée en base sans confirmation webhook valide
-- Données sensibles (email, téléphone) jamais loggées en console
+- `.env` jamais committé sur GitHub — contient les identifiants email + `ADMIN_PASSWORD`
+- Mot de passe admin stocké côté backend uniquement (env), transmis via header (ex: `X-Admin-Password`)
+- Ne jamais logguer en console les données sensibles (email, téléphone)
 - CORS configuré pour n'accepter que l'URL du frontend en production
 - HTTPS obligatoire en production
 
@@ -263,6 +271,36 @@ L'état global du tunnel est géré dans un objet central `B` (ou `bookingState`
 
 ---
 
+## Git workflow
+
+Claude Code prépare les commits mais ne push jamais seul.
+C'est l'utilisatrice qui valide et push.
+
+À la fin de chaque étape terminée et vérifiée :
+✅ Étape terminée — voici ton commit :
+
+```
+git add .
+git commit -m "type(scope): description"
+git push
+```
+
+Conventions :
+
+- feat : nouvelle fonctionnalité
+- fix : correction de bug
+- style : changement visuel sans logique
+- refactor : restructuration sans changement de comportement
+- chore : config, dépendances, setup
+
+Règles :
+
+- Un commit par étape fonctionnelle
+- Jamais de commit WIP
+- Ne jamais committer .env ou clés API
+
+---
+
 ## SEO — Objectifs Lighthouse
 
 - Performance > 90
@@ -275,6 +313,16 @@ L'état global du tunnel est géré dans un objet central `B` (ou `bookingState`
 
 ---
 
+## Principes fondamentaux
+
+- Simplicité d'abord : impact minimal sur le code existant
+- Vérifier avant de terminer : tester, vérifier les logs
+- Correction autonome : corriger les bugs sans demander à l'utilisatrice
+- Élégance : se demander s'il existe une solution plus simple avant d'implémenter
+- Ne jamais marquer une tâche terminée sans prouver que ça fonctionne
+
+---
+
 ## Phases de développement
 
 1. Cahier des charges ✅
@@ -282,6 +330,29 @@ L'état global du tunnel est géré dans un objet central `B` (ou `bookingState`
 3. CSS modulaire (base, layout, components, pages)
 4. JavaScript modulaire (router, services, booking, contact)
 5. index.html + SEO complet
-6. Intégration Stripe + webhook
+6. Intégration Interac (manuel) + dashboard admin
 7. Tests bout-en-bout + mobile
 8. Déploiement Vercel + Render + domaine + SSL
+
+---
+
+## Durées des prestations
+
+Femmes (dépend longueur) :
+
+- Classiques Braids épaules : 4h | mi-dos : 6h | bas du dos : 7h
+- Goddess Braids épaules : 6h | mi-dos : 7h | bas du dos : 8h
+- French Curls : selon complexité, 6h-8h
+
+Hommes :
+
+- Nattes : 1h30-2h
+- Barrel/Flat Twist : 2h30-3h
+- Box Braids : 3h
+- Twist : 2h30
+- Locks Retwist : 3h-4h (+ 1h30-2h si coiffure)
+
+Règle créneaux :
+
+- Prestation >= 6h → créneau 16h grisé automatiquement
+- Prestation < 6h → les deux créneaux disponibles

@@ -13,8 +13,17 @@
 // ============================================================
 
 // Pages valides — doit correspondre aux id des éléments .page dans index.html
-const VALID_PAGES = ['accueil', 'services', 'reservation', 'avis', 'politiques', 'contact', 'success', 'cancel'];
-const DEFAULT_PAGE = 'accueil';
+const VALID_PAGES = [
+  "accueil",
+  "a-propos",
+  "services",
+  "reservation",
+  "avis",
+  "politiques",
+  "contact",
+  "admin",
+];
+const DEFAULT_PAGE = "accueil";
 
 // Callbacks déclenchés à l'entrée d'une page spécifique
 // Map<pageId, Set<Function>>
@@ -35,41 +44,45 @@ export function navigate(pageId, { replace = false } = {}) {
   if (target === _currentPage && !replace) return;
 
   // ── DOM : affichage des sections ──
-  document.querySelectorAll('.page').forEach(el => {
-    el.classList.toggle('page--active', el.id === target);
+  document.querySelectorAll(".page").forEach((el) => {
+    el.classList.toggle("page--active", el.id === target);
   });
 
   // ── DOM : liens actifs dans la navbar ──
-  document.querySelectorAll('[data-nav]').forEach(el => {
-    if (el.classList.contains('navbar__link')) {
-      el.classList.toggle('is-active', el.dataset.nav === target);
+  document.querySelectorAll("[data-nav]").forEach((el) => {
+    if (el.classList.contains("navbar__link")) {
+      el.classList.toggle("is-active", el.dataset.nav === target);
     }
   });
 
   // ── URL : mise à jour du hash sans rechargement ──
   // On efface le hash pour la page par défaut (URL propre)
-  const hash = target === DEFAULT_PAGE ? window.location.pathname : `#${target}`;
+  const hash =
+    target === DEFAULT_PAGE ? window.location.pathname : `#${target}`;
   if (replace) {
-    history.replaceState({ page: target }, '', hash);
+    history.replaceState({ page: target }, "", hash);
   } else {
-    history.pushState({ page: target }, '', hash);
+    history.pushState({ page: target }, "", hash);
   }
 
   // Scroll immédiat en haut — 'instant' pour ne pas interférer avec fadeSlide
-  window.scrollTo({ top: 0, behavior: 'instant' });
+  window.scrollTo({ top: 0, behavior: "instant" });
 
   const previous = _currentPage;
   _currentPage = target;
 
   // ── Événement global — permet à main.js de fermer le menu mobile sans import circulaire ──
   document.dispatchEvent(
-    new CustomEvent('router:navigate', { detail: { page: target, previous } })
+    new CustomEvent("router:navigate", { detail: { page: target, previous } }),
   );
 
   // ── Callbacks enregistrés via onPageEnter ──
-  _enterCallbacks.get(target)?.forEach(cb => {
-    try { cb({ page: target, previous }); }
-    catch (err) { console.error(`[router] Erreur callback "${target}":`, err); }
+  _enterCallbacks.get(target)?.forEach((cb) => {
+    try {
+      cb({ page: target, previous });
+    } catch (err) {
+      console.error(`[router] Erreur callback "${target}":`, err);
+    }
   });
 }
 
@@ -100,15 +113,15 @@ export function getCurrentPage() {
 
 export function initRouter() {
   // Délégation globale : capture tous les [data-nav] présents et futurs dans le DOM
-  document.addEventListener('click', e => {
-    const trigger = e.target.closest('[data-nav]');
+  document.addEventListener("click", (e) => {
+    const trigger = e.target.closest("[data-nav]");
     if (!trigger) return;
     e.preventDefault();
     navigate(trigger.dataset.nav);
   });
 
   // Bouton retour / avant du navigateur
-  window.addEventListener('popstate', e => {
+  window.addEventListener("popstate", (e) => {
     const page = e.state?.page ?? _pageFromHash();
     // replace=true : le popstate n'est pas une nouvelle navigation intentionnelle
     navigate(page, { replace: true });
@@ -121,6 +134,6 @@ export function initRouter() {
 // ─── HELPER INTERNE ──────────────────────────────────────────
 
 function _pageFromHash() {
-  const hash = window.location.hash.replace('#', '').trim();
+  const hash = window.location.hash.replace("#", "").trim();
   return VALID_PAGES.includes(hash) ? hash : DEFAULT_PAGE;
 }

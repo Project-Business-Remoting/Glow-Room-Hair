@@ -84,6 +84,9 @@
           <a class="navbar__link" data-nav="services" href="#services"
             >Services</a
           >
+          <a class="navbar__link" data-nav="a-propos" href="#a-propos"
+            >À propos</a
+          >
           <a class="navbar__link" data-nav="avis" href="#avis">Avis</a>
           <a class="navbar__link" data-nav="contact" href="#contact">Contact</a>
           <div class="navbar__cta">
@@ -229,6 +232,81 @@
       ></section>
 
       <!-- ──────────────────────────────────────────────────
+         À PROPOS — contenu statique
+         ────────────────────────────────────────────────── -->
+      <section id="a-propos" class="page" aria-labelledby="apropos-title">
+        <div class="container section">
+          <header class="section-header">
+            <span class="section-header__eyebrow">Notre salon</span>
+            <h2 class="section-header__title" id="apropos-title">À propos</h2>
+            <div class="divider"></div>
+          </header>
+
+          <div class="grid grid--2" style="align-items: start">
+            <article>
+              <h3
+                class="text-brown"
+                style="
+                  font-family: var(--font-serif);
+                  font-size: var(--fs-md);
+                  margin-bottom: var(--space-md);
+                "
+              >
+                Glow Room Hair
+              </h3>
+              <p
+                class="text-muted"
+                style="font-size: var(--fs-sm); line-height: 1.8"
+              >
+                Glow Room Hair est un salon spécialisé en tresses et coiffures
+                protectrices à Ottawa–Gatineau. Notre priorité : un travail
+                propre, confortable et durable, adapté à vos cheveux et à votre
+                style.
+              </p>
+              <p
+                class="text-muted"
+                style="
+                  font-size: var(--fs-sm);
+                  line-height: 1.8;
+                  margin-top: var(--space-md);
+                "
+              >
+                Vous pouvez réserver en ligne en quelques minutes. Un dépôt de
+                15$ est requis pour confirmer votre rendez-vous.
+              </p>
+            </article>
+
+            <article>
+              <h3
+                class="text-brown"
+                style="
+                  font-family: var(--font-serif);
+                  font-size: var(--fs-md);
+                  margin-bottom: var(--space-md);
+                "
+              >
+                Comment ça marche
+              </h3>
+              <ul
+                class="text-muted"
+                style="
+                  font-size: var(--fs-sm);
+                  line-height: 1.9;
+                  padding-left: 1.1rem;
+                "
+              >
+                <li>Choisissez un service et une option</li>
+                <li>Sélectionnez une date et un créneau (9h00 ou 16h00)</li>
+                <li>Entrez vos informations</li>
+                <li>Envoyez le dépôt via Interac e-Transfer</li>
+                <li>La confirmation est envoyée dès réception</li>
+              </ul>
+            </article>
+          </div>
+        </div>
+      </section>
+
+      <!-- ──────────────────────────────────────────────────
          RÉSERVATION — injecté par booking.js via onPageEnter
          ────────────────────────────────────────────────── -->
       <section
@@ -354,10 +432,9 @@
       ></section>
 
       <!-- ──────────────────────────────────────────────────
-         SUCCESS / CANCEL — résultat retour Stripe
+         ADMIN — injecté par admin.js via onPageEnter
          ────────────────────────────────────────────────── -->
-      <section id="success" class="page" aria-label="Paiement confirmé"></section>
-      <section id="cancel" class="page" aria-label="Paiement annulé"></section>
+      <section id="admin" class="page" aria-label="Administration"></section>
     </main>
 
     <!-- ════════════════════════════════════════════════════
@@ -402,6 +479,7 @@
                   >Services &amp; Tarifs</a
                 >
               </li>
+              <li><a data-nav="a-propos" href="#a-propos">À propos</a></li>
               <li>
                 <a data-nav="reservation" href="#reservation">Réserver</a>
               </li>
