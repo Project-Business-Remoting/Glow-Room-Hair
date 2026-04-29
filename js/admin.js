@@ -7,6 +7,27 @@ import { onPageEnter } from "./router.js";
 
 const BACKEND_URL = "https://glow-room-backend.onrender.com";
 
+const MONTH_NAMES = [
+  "Janvier",
+  "Février",
+  "Mars",
+  "Avril",
+  "Mai",
+  "Juin",
+  "Juillet",
+  "Août",
+  "Septembre",
+  "Octobre",
+  "Novembre",
+  "Décembre",
+];
+const DAY_ABBREVS = ["Lu", "Ma", "Me", "Je", "Ve", "Sa", "Di"];
+
+let _calYear = null;
+let _calMonth = null; // 0-indexed
+let _selectedDate = null; // YYYY-MM-DD
+let _monthCounts = new Map(); // Map<YYYY-MM-DD, count>
+
 export function initAdmin() {
   onPageEnter("admin", _onEnter);
 }
@@ -77,6 +98,11 @@ function _renderLogin(root) {
 }
 
 async function _renderDashboard(root) {
+  const now = new Date();
+  if (_calYear === null) _calYear = now.getFullYear();
+  if (_calMonth === null) _calMonth = now.getMonth();
+  if (!_selectedDate) _selectedDate = _todayIso();
+
   root.innerHTML = `
     <div style="display:flex;flex-wrap:wrap;gap:var(--space-md);align-items:center;justify-content:space-between;margin-bottom:var(--space-lg);">
       <div style="display:flex;flex-wrap:wrap;gap:var(--space-sm);">
@@ -85,6 +111,7 @@ async function _renderDashboard(root) {
         <button type="button" class="btn btn-ghost btn--sm" data-range="all">Toutes</button>
       </div>
       <div style="display:flex;gap:var(--space-sm);align-items:center;">
+        <button type="button" class="btn btn-ghost btn--sm" data-action="smtp-test">Tester email</button>
         <button type="button" class="btn btn-ghost btn--sm" data-action="logout">Déconnexion</button>
       </div>
     </div>
@@ -96,19 +123,41 @@ async function _renderDashboard(root) {
       </span>
     </div>
 
-    <div style="display:flex;flex-wrap:wrap;gap:var(--space-md);align-items:end;margin-bottom:var(--space-xl);">
-      <div class="form-group" style="min-width:240px;">
-        <label class="form-label" for="block-date">Date</label>
-        <input class="form-input" type="date" id="block-date" />
+    <div class="grid grid--2" style="align-items:start;gap:var(--space-xl);margin-bottom:var(--space-xl);">
+      <div>
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:var(--space-md);">
+          <button type="button" class="btn btn-ghost btn--sm" data-action="cal-prev">◀</button>
+          <strong data-cal-month style="font-family:var(--font-serif);color:var(--brown);font-size:var(--fs-md);"></strong>
+          <button type="button" class="btn btn-ghost btn--sm" data-action="cal-next">▶</button>
+        </div>
+
+        <div class="booking-calendar" data-cal-grid></div>
+
+        <div style="margin-top:var(--space-md);display:flex;flex-wrap:wrap;gap:var(--space-md);align-items:end;">
+          <div class="form-group" style="min-width:240px;">
+            <label class="form-label" for="block-date">Date sélectionnée</label>
+            <input class="form-input" type="date" id="block-date" />
+          </div>
+          <button type="button" class="btn btn-dark" data-action="block-16">Bloquer 16h</button>
+          <button type="button" class="btn btn-ghost" data-action="load-day">Voir réservations du jour</button>
+        </div>
       </div>
-      <button type="button" class="btn btn-dark" data-action="block-16">Bloquer 16h</button>
+
+      <div>
+        <div class="info-box" style="margin-bottom:var(--space-md);">
+          <span class="info-box__icon" aria-hidden="true">🗓</span>
+          <span>
+            Cliquez une date pour la sélectionner. "Voir réservations du jour" filtre la liste sur cette date.
+          </span>
+        </div>
+      </div>
     </div>
 
     <div id="admin-list" aria-live="polite"></div>
   `;
 
   const dateInput = root.querySelector("#block-date");
-  if (dateInput) dateInput.value = _todayIso();
+  if (dateInput) dateInput.value = _selectedDate;
 
   root.addEventListener("click", (e) => {
     const logout = e.target.closest('[data-action="logout"]');
@@ -118,9 +167,33 @@ async function _renderDashboard(root) {
       return _render();
     }
 
+    const smtpTest = e.target.closest('[data-action="smtp-test"]');
+    if (smtpTest) {
+      _smtpTest();
+      return;
+    }
+
     const rangeBtn = e.target.closest("[data-range]");
     if (rangeBtn) {
       _loadReservations(root, rangeBtn.dataset.range);
+      return;
+    }
+
+    const prev = e.target.closest('[data-action="cal-prev"]');
+    if (prev) {
+      _changeMonth(-1, root);
+      return;
+    }
+
+    const next = e.target.closest('[data-action="cal-next"]');
+    if (next) {
+      _changeMonth(+1, root);
+      return;
+    }
+
+    const day = e.target.closest("[data-cal-day]");
+    if (day) {
+      _selectDate(day.dataset.calDay, root);
       return;
     }
 
@@ -129,6 +202,14 @@ async function _renderDashboard(root) {
       const date = root.querySelector("#block-date")?.value;
       if (!date) return _toast("Veuillez choisir une date.", "info");
       _blockSlot(date, "16:00");
+      return;
+    }
+
+    const loadDay = e.target.closest('[data-action="load-day"]');
+    if (loadDay) {
+      const date = root.querySelector("#block-date")?.value;
+      if (!date) return _toast("Veuillez choisir une date.", "info");
+      _loadReservationsForDate(root, date);
       return;
     }
 
@@ -145,7 +226,190 @@ async function _renderDashboard(root) {
     }
   });
 
-  await _loadReservations(root, "today");
+  _refreshCalendar(root);
+  await _loadMonthCounts();
+  _refreshCalendar(root);
+  await _loadReservationsForDate(root, _selectedDate);
+}
+
+async function _smtpTest() {
+  try {
+    const res = await fetch(`${BACKEND_URL}/admin/smtp-status`, {
+      headers: _adminHeaders(),
+    });
+    if (!res.ok) {
+      if (res.status === 401) {
+        sessionStorage.removeItem("admin_password");
+        _toast("Mot de passe invalide.", "error");
+        return _render();
+      }
+      throw new Error(await res.text());
+    }
+    const data = await res.json();
+    const smtp = data?.smtp;
+    if (!smtp?.configured) {
+      _toast("Email: variables manquantes côté backend.", "error");
+      return;
+    }
+    if (smtp.ok) {
+      _toast(`SMTP OK (${smtp.host}:${smtp.port}).`, "success");
+      return;
+    }
+    _toast(`SMTP KO: ${smtp.error || "Erreur"}`, "error");
+  } catch (err) {
+    console.error("[admin] smtpTest:", err);
+    _toast("Test SMTP impossible.", "error");
+  }
+}
+
+function _changeMonth(dir, root) {
+  const candidate = new Date(_calYear, _calMonth + dir, 1);
+  const min = new Date(2020, 0, 1);
+  const max = new Date(2099, 11, 1);
+  if (candidate < min || candidate > max) return;
+  _calYear = candidate.getFullYear();
+  _calMonth = candidate.getMonth();
+  _loadMonthCounts().finally(() => {
+    _refreshCalendar(root);
+  });
+}
+
+function _selectDate(isoDate, root) {
+  _selectedDate = isoDate;
+  const input = root.querySelector("#block-date");
+  if (input) input.value = isoDate;
+  _refreshCalendar(root);
+}
+
+function _refreshCalendar(root) {
+  const monthLabel = root.querySelector("[data-cal-month]");
+  const grid = root.querySelector("[data-cal-grid]");
+  if (!monthLabel || !grid) return;
+
+  monthLabel.textContent = `${MONTH_NAMES[_calMonth]} ${_calYear}`;
+
+  const first = new Date(_calYear, _calMonth, 1);
+  const last = new Date(_calYear, _calMonth + 1, 0);
+
+  // JS: 0=Dim..6=Sam, on veut démarrer lundi
+  const jsDay = first.getDay();
+  const offset = (jsDay + 6) % 7; // lun=0 ... dim=6
+
+  const cells = [];
+  for (let i = 0; i < offset; i++) {
+    cells.push(
+      `<div class="booking-calendar__day is-empty" aria-hidden="true"></div>`,
+    );
+  }
+
+  for (let d = 1; d <= last.getDate(); d++) {
+    const iso = _toIsoDate(_calYear, _calMonth, d);
+    const isSelected = iso === _selectedDate;
+    const count = _monthCounts.get(iso) || 0;
+    const badge = count
+      ? `<span style="display:inline-block;min-width:18px;padding:2px 6px;border-radius:999px;background:var(--caramel2);color:var(--brown);font-size:12px;line-height:1;">${count}</span>`
+      : "";
+
+    cells.push(`
+      <button type="button"
+        class="booking-calendar__day ${isSelected ? "is-selected" : ""}"
+        data-cal-day="${_escAttr(iso)}"
+        aria-pressed="${isSelected}"
+      >
+        <span>${d}</span>
+        ${badge}
+      </button>
+    `);
+  }
+
+  const head = DAY_ABBREVS.map(
+    (d) => `<div class="booking-calendar__head" aria-hidden="true">${d}</div>`,
+  ).join("");
+
+  grid.innerHTML = `${head}${cells.join("")}`;
+}
+
+function _toIsoDate(year, month0, day) {
+  const m = String(month0 + 1).padStart(2, "0");
+  const d = String(day).padStart(2, "0");
+  return `${year}-${m}-${d}`;
+}
+
+async function _loadMonthCounts() {
+  const start = _toIsoDate(_calYear, _calMonth, 1);
+  const end = _toIsoDate(_calYear, _calMonth + 1, 0);
+
+  try {
+    const url = new URL(`${BACKEND_URL}/admin/reservations`);
+    url.searchParams.set("start", start);
+    url.searchParams.set("end", end);
+
+    const res = await fetch(url.toString(), { headers: _adminHeaders() });
+    if (!res.ok) {
+      if (res.status === 401) {
+        sessionStorage.removeItem("admin_password");
+        _toast("Mot de passe invalide.", "error");
+        return _render();
+      }
+      throw new Error(await res.text());
+    }
+
+    const data = await res.json();
+    const reservations = Array.isArray(data.reservations)
+      ? data.reservations
+      : [];
+    const map = new Map();
+    for (const r of reservations) {
+      const date = String(r?.date || "");
+      if (!date) continue;
+      map.set(date, (map.get(date) || 0) + 1);
+    }
+    _monthCounts = map;
+  } catch (err) {
+    console.error("[admin] loadMonthCounts:", err);
+    _monthCounts = new Map();
+  }
+}
+
+async function _loadReservationsForDate(root, date) {
+  const listEl = root.querySelector("#admin-list");
+  if (!listEl) return;
+  listEl.innerHTML = `<p style="font-size:var(--fs-sm);color:var(--muted);">Chargement…</p>`;
+
+  try {
+    const url = new URL(`${BACKEND_URL}/admin/reservations`);
+    url.searchParams.set("start", date);
+    url.searchParams.set("end", date);
+
+    const res = await fetch(url.toString(), { headers: _adminHeaders() });
+
+    if (!res.ok) {
+      if (res.status === 401) {
+        sessionStorage.removeItem("admin_password");
+        _toast("Mot de passe invalide.", "error");
+        return _render();
+      }
+      throw new Error(await res.text());
+    }
+
+    const data = await res.json();
+    const reservations = Array.isArray(data.reservations)
+      ? data.reservations
+      : [];
+
+    reservations.sort((a, b) => {
+      return String(a.time || a.slot || "").localeCompare(
+        String(b.time || b.slot || ""),
+      );
+    });
+
+    listEl.innerHTML = reservations.length
+      ? reservations.map(_renderReservationCard).join("")
+      : `<p style="font-size:var(--fs-sm);color:var(--muted);">Aucune réservation pour ${_esc(date)}.</p>`;
+  } catch (err) {
+    console.error("[admin] loadReservationsForDate:", err);
+    listEl.innerHTML = `<p style="font-size:var(--fs-sm);color:var(--muted);">Erreur de chargement.</p>`;
+  }
 }
 
 async function _loadReservations(root, range) {
