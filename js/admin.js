@@ -111,13 +111,12 @@ async function _renderDashboard(root) {
     <!-- Top Bar -->
     <div style="display:flex;flex-wrap:wrap;gap:var(--space-md);align-items:center;justify-content:space-between;margin-bottom:var(--space-xl);">
       <div class="admin-tabs" style="display:flex;gap:var(--space-xs);background:var(--bg-card);padding:4px;border-radius:12px;border:1px solid var(--caramel2);">
-        <button type="button" class="admin-tab-btn ${(_activeTab === 'agenda') ? 'is-active' : ''}" data-tab="agenda">📅 Agenda</button>
-        <button type="button" class="admin-tab-btn ${(_activeTab === 'trash') ? 'is-active' : ''}" data-tab="trash">🗑️ Corbeille</button>
+        <button type="button" class="admin-tab-btn ${(_activeTab === 'agenda') ? 'is-active' : ''}" data-tab="agenda">Agenda</button>
+        <button type="button" class="admin-tab-btn ${(_activeTab === 'trash') ? 'is-active' : ''}" data-tab="trash">Corbeille</button>
       </div>
       
       <div style="display:flex;gap:var(--space-sm);align-items:center;">
-        <button type="button" class="btn btn-ghost btn--sm" data-action="smtp-test">📧 Test Email</button>
-        <button type="button" class="btn btn-ghost btn--sm" data-action="logout">🚪 Déconnexion</button>
+        <button type="button" class="btn btn-ghost btn--sm" data-action="logout">Déconnexion</button>
       </div>
     </div>
 
@@ -183,7 +182,7 @@ async function _renderDashboard(root) {
 function _buildAgendaHTML() {
   return `
     <div class="grid grid--2" style="align-items:start;gap:var(--space-xl);margin-bottom:var(--space-xl);">
-      <div>
+      <div style="background:var(--bg-card);padding:var(--space-lg);border-radius:16px;box-shadow:0 10px 30px rgba(89,60,31,0.05);border:1px solid var(--caramel2);">
         <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:var(--space-md);">
           <button type="button" class="btn btn-ghost btn--sm" data-action="cal-prev">◀</button>
           <strong data-cal-month style="font-family:var(--font-serif);color:var(--brown);font-size:var(--fs-md);"></strong>
@@ -193,7 +192,7 @@ function _buildAgendaHTML() {
         <div class="booking-calendar" data-cal-grid></div>
 
         <div style="margin-top:var(--space-md);display:flex;flex-wrap:wrap;gap:var(--space-md);align-items:end;">
-          <div class="form-group" style="min-width:200px;margin-bottom:0;">
+          <div class="form-group" style="min-width:180px;margin-bottom:0;">
             <label class="form-label" for="block-date">Date cible</label>
             <input class="form-input" type="date" id="block-date" />
           </div>
@@ -228,7 +227,7 @@ function _buildTrashHTML() {
   return `
     <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:var(--space-lg);">
       <h3 style="font-family:var(--font-serif);color:var(--brown);">Réservations annulées</h3>
-      <button type="button" class="btn btn-dark btn--sm" data-action="empty-trash">💥 Vider la corbeille</button>
+      <button type="button" class="btn btn-dark btn--sm" data-action="empty-trash">Vider la corbeille</button>
     </div>
     <div id="admin-trash-list" aria-live="polite"></div>
   `;
@@ -253,12 +252,6 @@ function _bindEvents(root) {
       sessionStorage.removeItem("admin_password");
       _toast("Déconnecté.", "info");
       return _render();
-    }
-
-    const smtpTest = e.target.closest('[data-action="smtp-test"]');
-    if (smtpTest) {
-      _smtpTest();
-      return;
     }
 
     const rangeBtn = e.target.closest("[data-range]");
@@ -329,28 +322,6 @@ function _bindEvents(root) {
       return;
     }
   });
-}
-
-async function _smtpTest() {
-  try {
-    const res = await fetch(`${BACKEND_URL}/admin/test-email`, {
-      method: "POST",
-      headers: _adminHeaders(),
-    });
-    if (!res.ok) {
-      if (res.status === 401) {
-        sessionStorage.removeItem("admin_password");
-        _toast("Mot de passe invalide.", "error");
-        return _render();
-      }
-      throw new Error(await res.text());
-    }
-
-    _toast("Email de test envoyé.", "success");
-  } catch (err) {
-    console.error("[admin] smtpTest:", err);
-    _toast("Envoi test impossible.", "error");
-  }
 }
 
 function _changeMonth(dir, root) {
@@ -555,7 +526,7 @@ function _renderReservationCard(r) {
   const id = String(r.id || "");
   const isCancelled = _isCancelledStatus(status);
   const isConfirmed = status === 'confirmé';
-  const lang = r.lang === 'en' ? '🇬🇧 EN' : '🇫🇷 FR';
+  const lang = r.lang === 'en' ? 'EN' : 'FR';
 
   let statusBadge = "";
   if (isCancelled) statusBadge = `<span style="color:#d9534f;font-weight:700;font-size:10px;text-transform:uppercase;border:1px solid #d9534f;padding:2px 6px;border-radius:4px;">Annulé</span>`;
@@ -563,7 +534,7 @@ function _renderReservationCard(r) {
   else statusBadge = `<span style="color:var(--brown);font-weight:700;font-size:10px;text-transform:uppercase;border:1px solid var(--brown);padding:2px 6px;border-radius:4px;">En attente</span>`;
 
   return `
-    <div class="booking-confirmation fade-in" style="margin-bottom:var(--space-lg);border:1px solid var(--caramel2);box-shadow:none;text-align:left;">
+    <div class="booking-confirmation fade-in" style="margin-bottom:var(--space-lg);border:1px solid rgba(89,60,31,0.15);box-shadow:0 8px 24px rgba(89,60,31,0.06);text-align:left;background:#fff;">
       <div style="display:flex;justify-content:space-between;align-items:start;margin-bottom:15px;">
         <div>
           <h3 style="font-size:var(--fs-md);color:var(--brown);margin:0;">${_esc(r.clientName)}</h3>
