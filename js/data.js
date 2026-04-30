@@ -147,7 +147,7 @@ export const METHODES_PAIEMENT = [
     description: 'Virement bancaire canadien — simple et sécurisé',
     via: 'manuel',
     actif: true,
-    instructions: `Envoyez 15$ CAD à ${SALON.email} via Interac e-Transfer. Utilisez votre nom complet comme message. Votre réservation sera confirmée dès réception.`,
+    instructions: `Envoyez 25$ CAD à ${SALON.email} via Interac e-Transfer. Utilisez votre nom complet comme message. Votre réservation sera confirmée dès réception.`,
   },
 ];
 
