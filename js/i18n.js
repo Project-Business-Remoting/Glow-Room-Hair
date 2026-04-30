@@ -156,7 +156,9 @@ export const translations = {
     "booking.toast.error": "Une erreur est survenue. Veuillez réessayer.",
     "booking.timer.confirmed": "Paiement reçu — Votre rendez-vous est confirmé !",
     "booking.timer.cancelled": "Créneau annulé. Veuillez nous contacter.",
-    "booking.s4.success.rebook": "Nouvelle réservation"
+    "booking.s4.success.rebook": "Nouvelle réservation",
+    "contact.toast.success": "Message envoyé ! Nous vous répondrons sous 24h.",
+    "contact.toast.error": "Une erreur est survenue. Veuillez réessayer ou nous écrire directement."
   },
   en: {
     // Nav
@@ -316,6 +318,8 @@ export const translations = {
     "booking.timer.confirmed": "Payment received — Your appointment is confirmed!",
     "booking.timer.cancelled": "Slot cancelled. Please contact us.",
     "booking.s4.success.rebook": "New Booking",
+    "contact.toast.success": "Message sent! We will get back to you within 24h.",
+    "contact.toast.error": "An error occurred. Please try again or write to us directly."
   }
 };
 

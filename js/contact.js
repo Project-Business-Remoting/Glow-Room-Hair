@@ -216,14 +216,14 @@ function _bindForm(form) {
       form.reset();
       document.dispatchEvent(new CustomEvent('app:toast', {
         detail: {
-          message: 'Message envoyé ! Nous vous répondrons sous 24h.',
+          message: t('contact.toast.success'),
           type: 'success',
         },
       }));
     } catch {
       document.dispatchEvent(new CustomEvent('app:toast', {
         detail: {
-          message: 'Une erreur est survenue. Veuillez réessayer ou nous écrire directement.',
+          message: t('contact.toast.error'),
           type: 'error',
         },
       }));
