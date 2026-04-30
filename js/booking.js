@@ -20,19 +20,21 @@ import { updateDOM, getLang, t } from './i18n.js';
 
 const B = {
   step:      0,
-  service:   null,   // { serviceId, variantId, categorie, label, prix, prixLabel, genre, dureeMinutes }
-  date:      null,   // 'YYYY-MM-DD'
-  slot:      null,   // '09:00' ou '16:00'
+  service:   null,
+  date:      null,
+  slot:      null,
   name:      '',
   phone:     '',
   email:     '',
   confirmed: false,
+  reservationId: null, // id Firestore pour polling de statut
 };
 
 let _calYear     = null;
-let _calMonth    = null; // 0-indexed
+let _calMonth    = null;
 let _initialized = false;
-let _timerInterval = null;
+let _timerInterval  = null;
+let _pollingInterval = null;
 
 // ─── CONSTANTS ───────────────────────────────────────────────
 
@@ -526,6 +528,8 @@ async function _handleConfirm(root) {
 
     if (!res.ok) throw new Error(await res.text());
 
+    const data = await res.json();
+    B.reservationId = data.id;
     B.confirmed = true;
     _renderStep(4);
     _startTimer(15 * 60);
@@ -705,16 +709,22 @@ function _resetState() {
   Object.assign(B, {
     step: 0, service: null, date: null, slot: null,
     name: '', phone: '', email: '', confirmed: false,
+    reservationId: null,
   });
   _calYear = _calMonth = null;
   if (_timerInterval) {
     clearInterval(_timerInterval);
     _timerInterval = null;
   }
+  if (_pollingInterval) {
+    clearInterval(_pollingInterval);
+    _pollingInterval = null;
+  }
 }
 
 function _startTimer(durationSeconds) {
-  if (_timerInterval) clearInterval(_timerInterval);
+  if (_timerInterval)  clearInterval(_timerInterval);
+  if (_pollingInterval) clearInterval(_pollingInterval);
   let remaining = durationSeconds;
   
   const display = document.getElementById('booking-timer-display');
@@ -724,15 +734,53 @@ function _startTimer(durationSeconds) {
     remaining--;
     if (remaining < 0) {
       clearInterval(_timerInterval);
+      if (_pollingInterval) clearInterval(_pollingInterval);
       display.textContent = "00:00";
-      display.style.color = "#d9534f"; // Red
+      display.style.color = "#d9534f";
       return;
     }
     const m = Math.floor(remaining / 60).toString().padStart(2, '0');
     const s = (remaining % 60).toString().padStart(2, '0');
     display.textContent = `${m}:${s}`;
-    if (remaining <= 60) display.style.color = "#d9534f"; // Red at last minute
+    if (remaining <= 60) display.style.color = "#d9534f";
   }, 1000);
+
+  // Polling toutes les 30s : si l'admin a confirmé, on arrête le timer
+  if (B.reservationId) {
+    _pollingInterval = setInterval(async () => {
+      try {
+        const res = await fetch(`${BACKEND_URL}/reservation/${B.reservationId}`);
+        if (!res.ok) return;
+        const data = await res.json();
+        if (data.status === 'confirmé' || data.status === 'confirmed') {
+          clearInterval(_timerInterval);
+          clearInterval(_pollingInterval);
+          _timerInterval  = null;
+          _pollingInterval = null;
+          // Affiche un message de succès—le paiement est confirmé
+          const timerEl = document.getElementById('booking-timer-display');
+          if (timerEl) {
+            timerEl.closest('.booking-timer').innerHTML =
+              `<span style="color: var(--caramel); font-size: 1rem;">` +
+              `✅ ${t('booking.timer.confirmed')}</span>`;
+          }
+        } else if (data.status === 'annulé' || data.status === 'cancelled') {
+          clearInterval(_timerInterval);
+          clearInterval(_pollingInterval);
+          _timerInterval  = null;
+          _pollingInterval = null;
+          const timerEl = document.getElementById('booking-timer-display');
+          if (timerEl) {
+            timerEl.closest('.booking-timer').innerHTML =
+              `<span style="color: #d9534f; font-size: 1rem;">` +
+              `❌ ${t('booking.timer.cancelled')}</span>`;
+          }
+        }
+      } catch (_) {
+        // Backend injoignable — on ne crash pas
+      }
+    }, 30_000);
+  }
 }
 
 function _toast(message, type = 'info') {

@@ -97,7 +97,7 @@ export const translations = {
 
     // Booking
     "booking.s0.title": "Réservez votre rendez-vous",
-    "booking.s0.text": "Choisissez votre service, une date et finalisez en quelques étapes. Un dépôt de <strong>15$</strong> (non remboursable) est requis pour confirmer le rendez-vous.",
+    "booking.s0.text": "Choisissez votre service, une date et finalisez en quelques étapes. Un dépôt de <strong>25$</strong> (non remboursable) est requis pour confirmer le rendez-vous.",
     "booking.s0.btn": "Commencer la réservation",
     "booking.s1.title": "Quel service souhaitez-vous ?",
     "booking.s1.subtitle": "Sélectionnez un service et une option pour continuer.",
@@ -133,7 +133,7 @@ export const translations = {
     "contact.hours.closed": "Fermé",
     "contact.hours.variable": "Ouverture entre 8h30 et 9h00",
 
-    "booking.s4.interac": "Pour confirmer votre réservation, envoyez <strong>15$ CAD</strong> à <strong>Tinidk17@gmail.com</strong> via Interac e-Transfer.<br>Indiquez votre nom complet en message.<br>Votre RDV sera confirmé dès réception du paiement.",
+    "booking.s4.interac": "Pour confirmer votre réservation, envoyez <strong>25$ CAD</strong> à <strong>Tinidk17@gmail.com</strong> via Interac e-Transfer.<br>Indiquez votre nom complet en message.<br>Votre RDV sera confirmé dès réception du paiement.",
     "booking.s4.ref": "Référence",
     "booking.s4.recap.service": "Service",
     "booking.s4.recap.date": "Date",
@@ -154,6 +154,8 @@ export const translations = {
     "booking.slots.available": "Créneaux disponibles",
     "booking.toast.success": "Votre demande de réservation a bien été envoyée !",
     "booking.toast.error": "Une erreur est survenue. Veuillez réessayer.",
+    "booking.timer.confirmed": "Paiement reçu — Votre rendez-vous est confirmé !",
+    "booking.timer.cancelled": "Créneau annulé. Veuillez nous contacter.",
     "booking.s4.success.rebook": "Nouvelle réservation"
   },
   en: {
@@ -254,7 +256,7 @@ export const translations = {
 
     // Booking
     "booking.s0.title": "Book your appointment",
-    "booking.s0.text": "Choose your service, a date, and finalize in a few steps. A <strong>$15</strong> (non-refundable) deposit is required to confirm the appointment.",
+    "booking.s0.text": "Choose your service, a date, and finalize in a few steps. A <strong>$25</strong> (non-refundable) deposit is required to confirm the appointment.",
     "booking.s0.btn": "Start Booking",
     "booking.s1.title": "Which service do you want?",
     "booking.s1.subtitle": "Select a service and an option to continue.",
@@ -290,7 +292,7 @@ export const translations = {
     "contact.hours.closed": "Closed",
     "contact.hours.variable": "Opens between 8:30 AM and 9:00 AM",
 
-    "booking.s4.interac": "To confirm your booking, send <strong>$15 CAD</strong> to <strong>Tinidk17@gmail.com</strong> via Interac e-Transfer.<br>Include your full name in the message.<br>Your appointment will be confirmed upon receipt of payment.",
+    "booking.s4.interac": "To confirm your booking, send <strong>$25 CAD</strong> to <strong>Tinidk17@gmail.com</strong> via Interac e-Transfer.<br>Include your full name in the message.<br>Your appointment will be confirmed upon receipt of payment.",
     "booking.s4.ref": "Reference",
     "booking.s4.recap.service": "Service",
     "booking.s4.recap.date": "Date",
@@ -311,6 +313,8 @@ export const translations = {
     "booking.slots.available": "Available slots",
     "booking.toast.success": "Your booking request has been sent!",
     "booking.toast.error": "An error occurred. Please try again.",
+    "booking.timer.confirmed": "Payment received — Your appointment is confirmed!",
+    "booking.timer.cancelled": "Slot cancelled. Please contact us.",
     "booking.s4.success.rebook": "New Booking",
   }
 };

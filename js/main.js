@@ -33,7 +33,17 @@ document.addEventListener("DOMContentLoaded", () => {
 
   // En dernier : déclenche la navigation initiale vers la page du hash courant
   initRouter();
+
+  // Réveil anticipé du backend (Render cold start)
+  _warmUpBackend();
 });
+
+async function _warmUpBackend() {
+  try {
+    // On ping la route health pour réveiller le serveur Render
+    fetch('https://glow-room-backend.onrender.com/health').catch(() => {});
+  } catch (e) {}
+}
 
 // ─── I18N ────────────────────────────────────────────────────
 

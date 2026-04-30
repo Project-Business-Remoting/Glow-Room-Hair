@@ -34,10 +34,10 @@ export const HORAIRES = [
 
 export const POLITIQUES = {
   depot: {
-    montant: 15,
+    montant: 25,
     devise: 'CAD',
     remboursable: false,
-    description: 'Un dépôt de 15$ est requis à la réservation. Il est déduit de la facture finale et n\'est pas remboursable.',
+    description: 'Un dépôt de 25$ est requis à la réservation. Il est déduit de la facture finale et n\'est pas remboursable.',
   },
   retard: {
     graceMinutes: 15,
