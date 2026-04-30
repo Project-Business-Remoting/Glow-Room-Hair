@@ -25,6 +25,10 @@
   user-select: none;
 }
 
+@media (max-width: 400px) {
+  .btn { white-space: normal; text-align: center; }
+}
+
 .btn:active { transform: scale(0.97); }
 
 .btn:disabled,
@@ -170,11 +174,17 @@
 .service-card__variant-price { font-weight: 600; color: var(--caramel); font-size: var(--fs-sm); }
 
 .service-card__photo {
-  height: 320px;
+  height: 200px;
   border-radius: var(--radius-sm) var(--radius-sm) 0 0;
   overflow: hidden;
   margin: calc(-1 * var(--space-lg));
   margin-bottom: var(--space-md);
+}
+
+@media (min-width: 640px) {
+  .service-card__photo {
+    height: 320px;
+  }
 }
 
 .service-card__photo img {

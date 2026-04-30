@@ -177,9 +177,12 @@
 /* ─── PAGE : RÉSERVATION ────────────────────────────────────── */
 
 .booking-page {
+  width: 100%;
   max-width: 660px;
   margin-inline: auto;
+  padding-inline: var(--space-md);
   padding-block: var(--space-xl) var(--space-2xl);
+  box-sizing: border-box;
 }
 
 /* Chaque step entre en animation — @keyframes fadeSlide défini dans layout.css */
@@ -232,8 +235,9 @@
 .booking-calendar {
   display: grid;
   grid-template-columns: repeat(7, 1fr);
-  gap: var(--space-xs);
+  gap: 2px;
   margin-bottom: var(--space-xl);
+  width: 100%;
 }
 
 .booking-calendar__day-name {
@@ -460,9 +464,17 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
+  gap: var(--space-sm);
   margin-top: var(--space-xl);
   padding-top: var(--space-lg);
   border-top: 1px solid var(--border);
+  flex-wrap: wrap;
+}
+
+.booking-nav .btn,
+.booking-nav .btn-back {
+  min-width: 0;
+  flex-shrink: 1;
 }
 
 /* ─── PAGE : AVIS ───────────────────────────────────────────── */
