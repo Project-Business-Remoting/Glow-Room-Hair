@@ -14,7 +14,7 @@ import {
   SERVICES_HOMMES,
 } from './data.js';
 import { onPageEnter } from './router.js';
-import { updateDOM, getLang } from './i18n.js';
+import { updateDOM, getLang, t } from './i18n.js';
 
 // ─── ÉTAT CENTRAL ────────────────────────────────────────────
 
