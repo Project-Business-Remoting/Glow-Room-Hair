@@ -3,7 +3,7 @@
   <head>
     <!-- ── Essentiels ─────────────────────────────────────── -->
     <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0" />
 
     <!-- ── SEO ───────────────────────────────────────────── -->
     <title>Glow Room Studio — Braids &amp; Ottawa</title>
@@ -80,20 +80,17 @@
 
         <!-- Menu de navigation -->
         <div class="navbar__menu" id="nav-menu" aria-label="Menu de navigation">
-          <a class="navbar__link" data-nav="accueil" href="/">Accueil</a>
-          <a class="navbar__link" data-nav="services" href="#services"
-            >Services</a
-          >
-          <a class="navbar__link" data-nav="a-propos" href="#a-propos"
-            >À propos</a
-          >
-          <a class="navbar__link" data-nav="avis" href="#avis">Avis</a>
-          <a class="navbar__link" data-nav="contact" href="#contact">Contact</a>
+          <a class="navbar__link" data-nav="accueil" href="/" data-i18n="nav.accueil">Accueil</a>
+          <a class="navbar__link" data-nav="services" href="#services" data-i18n="nav.services">Services</a>
+          <a class="navbar__link" data-nav="a-propos" href="#a-propos" data-i18n="nav.apropos">À propos</a>
+          <a class="navbar__link" data-nav="politiques" href="#politiques" data-i18n="nav.politiques">Politiques</a>
+          <a class="navbar__link" data-nav="contact" href="#contact" data-i18n="nav.contact">Contact</a>
+          <button type="button" class="lang-switch" id="lang-toggle" style="background:none;border:1px solid #ccc;border-radius:4px;padding:4px 8px;cursor:pointer;margin-right:10px;color:var(--text);font-family:var(--font-sans);font-weight:600;">EN</button>
           <div class="navbar__cta">
             <button
               type="button"
               class="btn btn-dark btn--sm"
-              data-nav="reservation"
+              data-nav="reservation" data-i18n="nav.reserver"
             >
               Réserver
             </button>
@@ -119,14 +116,14 @@
       >
         <div class="hero">
           <div class="container">
-            <span class="hero__eyebrow">Ottawa – Gatineau · Canada</span>
+            <span class="hero__eyebrow" data-i18n="hero.eyebrow">Ottawa – Gatineau · Canada</span>
 
-            <h1 class="hero__title" id="hero-title">
+            <h1 class="hero__title" id="hero-title" data-i18n="hero.title">
               Des tresses <em>qui subliment</em>,<br />
               un soin qui dure.
             </h1>
 
-            <p class="hero__subtitle">
+            <p class="hero__subtitle" data-i18n="hero.subtitle">
               Spécialistes en tresses et coiffures protectrices — Knotless
               Braids, Goddess Braids, Locks et bien plus. Réservez votre
               rendez-vous en quelques clics.
@@ -136,11 +133,11 @@
               <button
                 type="button"
                 class="btn btn-dark btn--lg"
-                data-nav="reservation"
+                data-nav="reservation" data-i18n="hero.btn.reserver"
               >
                 Réserver maintenant
               </button>
-              <button type="button" class="btn btn-ghost" data-nav="services">
+              <button type="button" class="btn btn-ghost" data-nav="services" data-i18n="hero.btn.services">
                 Voir les services
               </button>
             </div>
@@ -148,19 +145,19 @@
             <div class="hero__trust" aria-label="Nos engagements">
               <div class="hero__trust-item">
                 <span class="hero__trust-icon" aria-hidden="true">✓</span>
-                <span>Spécialistes en coiffures protectrices</span>
+                <span data-i18n="hero.trust.1">Spécialistes en coiffures protectrices</span>
               </div>
               <div class="hero__trust-item">
                 <span class="hero__trust-icon" aria-hidden="true">✓</span>
-                <span>Réservation en ligne 24h/24</span>
+                <span data-i18n="hero.trust.2">Réservation en ligne 24h/24</span>
               </div>
               <div class="hero__trust-item">
                 <span class="hero__trust-icon" aria-hidden="true">✓</span>
-                <span>Dépôt de 15$ seulement</span>
+                <span data-i18n="hero.trust.3">Dépôt de 15$ seulement</span>
               </div>
             </div>
           </div>
-          <div class="hero__image">
+          <div class="hero__image fade-in" style="transition-delay: 0.2s;">
             <img
               src="images/marley-twist.jpg"
               alt="Boho Braids bas du dos — Glow Room Hair Ottawa"
@@ -171,11 +168,11 @@
 
         <div class="gallery container section">
           <header class="section-header section-header--center">
-            <span class="section-header__eyebrow">Notre travail</span>
-            <h2 class="section-header__title">Galerie</h2>
+            <span class="section-header__eyebrow" data-i18n="gallery.eyebrow">Notre travail</span>
+            <h2 class="section-header__title" data-i18n="gallery.title">Galerie</h2>
             <div class="divider divider--center"></div>
           </header>
-          <div class="gallery__grid">
+          <div class="gallery__grid fade-in">
             <div class="gallery__item">
               <img
                 src="images/IMAGLOWROOM-6.jpeg"
@@ -220,6 +217,9 @@
             </div>
           </div>
         </div>
+
+        <!-- Section des avis intégrée à l'accueil -->
+        <div id="avis-container"></div>
       </section>
 
       <!-- ──────────────────────────────────────────────────
@@ -237,31 +237,28 @@
       <section id="a-propos" class="page" aria-labelledby="apropos-title">
         <div class="container section">
           <header class="section-header">
-            <span class="section-header__eyebrow">Notre salon</span>
-            <h2 class="section-header__title" id="apropos-title">À propos</h2>
+            <span class="section-header__eyebrow" data-i18n="apropos.eyebrow">Notre salon</span>
+            <h2 class="section-header__title" id="apropos-title" data-i18n="apropos.title">À propos</h2>
             <div class="divider"></div>
           </header>
 
           <div class="grid grid--2" style="align-items: start">
-            <article>
+            <article class="fade-in">
               <h3
                 class="text-brown"
                 style="
                   font-family: var(--font-serif);
                   font-size: var(--fs-md);
                   margin-bottom: var(--space-md);
-                "
+                " data-i18n="apropos.h3.1"
               >
                 Glow Room Hair
               </h3>
               <p
                 class="text-muted"
-                style="font-size: var(--fs-sm); line-height: 1.8"
+                style="font-size: var(--fs-sm); line-height: 1.8" data-i18n="apropos.p.1"
               >
-                Glow Room Hair est un salon spécialisé en tresses et coiffures
-                protectrices à Ottawa–Gatineau. Notre priorité : un travail
-                propre, confortable et durable, adapté à vos cheveux et à votre
-                style.
+                Glow Room Hair est un salon spécialisé en tresses et coiffures protectrices à Ottawa–Gatineau. Notre priorité : un travail propre, confortable et durable, adapté à vos cheveux et à votre style.
               </p>
               <p
                 class="text-muted"
@@ -269,21 +266,20 @@
                   font-size: var(--fs-sm);
                   line-height: 1.8;
                   margin-top: var(--space-md);
-                "
+                " data-i18n="apropos.p.2"
               >
-                Vous pouvez réserver en ligne en quelques minutes. Un dépôt de
-                15$ est requis pour confirmer votre rendez-vous.
+                Vous pouvez réserver en ligne en quelques minutes. Un dépôt de 15$ est requis pour confirmer votre rendez-vous.
               </p>
             </article>
 
-            <article>
+            <article class="fade-in" style="transition-delay: 0.15s;">
               <h3
                 class="text-brown"
                 style="
                   font-family: var(--font-serif);
                   font-size: var(--fs-md);
                   margin-bottom: var(--space-md);
-                "
+                " data-i18n="apropos.h3.2"
               >
                 Comment ça marche
               </h3>
@@ -295,11 +291,11 @@
                   padding-left: 1.1rem;
                 "
               >
-                <li>Choisissez un service et une option</li>
-                <li>Sélectionnez une date et un créneau (9h00 ou 16h00)</li>
-                <li>Entrez vos informations</li>
-                <li>Envoyez le dépôt via Interac e-Transfer</li>
-                <li>La confirmation est envoyée dès réception</li>
+                <li data-i18n="apropos.li.1">Choisissez un service et une option</li>
+                <li data-i18n="apropos.li.2">Sélectionnez une date et un créneau (9h00 ou 16h00)</li>
+                <li data-i18n="apropos.li.3">Entrez vos informations</li>
+                <li data-i18n="apropos.li.4">Envoyez le dépôt via Interac e-Transfer</li>
+                <li data-i18n="apropos.li.5">La confirmation est envoyée dès réception</li>
               </ul>
             </article>
           </div>
@@ -315,10 +311,7 @@
         aria-label="Réservation en ligne"
       ></section>
 
-      <!-- ──────────────────────────────────────────────────
-         AVIS — injecté par reviews.js via onPageEnter
-         ────────────────────────────────────────────────── -->
-      <section id="avis" class="page" aria-label="Avis clients"></section>
+      <!-- (La section AVIS a été intégrée à l'accueil) -->
 
       <!-- ──────────────────────────────────────────────────
          POLITIQUES — contenu statique (pas de JS requis)
@@ -326,97 +319,74 @@
       <section id="politiques" class="page" aria-labelledby="politiques-title">
         <div class="container section">
           <header class="section-header">
-            <span class="section-header__eyebrow"
-              >À savoir avant de réserver</span
-            >
-            <h2 class="section-header__title" id="politiques-title">
-              Politiques du salon
-            </h2>
+            <span class="section-header__eyebrow" data-i18n="politiques.eyebrow">À savoir avant de réserver</span>
+            <h2 class="section-header__title" id="politiques-title" data-i18n="politiques.title">Politiques du salon</h2>
             <div class="divider"></div>
           </header>
 
           <div class="grid grid--3">
-            <article>
+            <article class="fade-in">
               <h3
                 class="text-brown"
                 style="
                   font-family: var(--font-serif);
                   font-size: var(--fs-md);
                   margin-bottom: var(--space-md);
-                "
+                " data-i18n="politiques.depot.title"
               >
                 Dépôt de réservation
               </h3>
               <p
                 class="text-muted"
-                style="font-size: var(--fs-sm); line-height: 1.8"
+                style="font-size: var(--fs-sm); line-height: 1.8" data-i18n="politiques.depot.desc"
               >
-                Un dépôt de
-                <strong class="text-brown">15&nbsp;$&nbsp;CAD</strong> est
-                requis pour confirmer tout rendez-vous. Il est déduit de la
-                facture finale et est
-                <strong class="text-brown">non remboursable</strong>.
+                Un dépôt de <strong class="text-brown">15&nbsp;$&nbsp;CAD</strong> est requis pour confirmer tout rendez-vous. Il est déduit de la facture finale et est <strong class="text-brown">non remboursable</strong>.
               </p>
             </article>
 
-            <article>
+            <article class="fade-in" style="transition-delay: 0.1s;">
               <h3
                 class="text-brown"
                 style="
                   font-family: var(--font-serif);
                   font-size: var(--fs-md);
                   margin-bottom: var(--space-md);
-                "
+                " data-i18n="politiques.retard.title"
               >
                 Politique de retard
               </h3>
               <p
                 class="text-muted"
-                style="font-size: var(--fs-sm); line-height: 1.8"
+                style="font-size: var(--fs-sm); line-height: 1.8" data-i18n="politiques.retard.desc"
               >
-                Une grâce de <strong class="text-brown">15 minutes</strong> est
-                accordée. Au-delà, le rendez-vous peut être annulé et le dépôt
-                ne sera pas remboursé.
+                Une grâce de <strong class="text-brown">15 minutes</strong> est accordée. Au-delà, le rendez-vous peut être annulé et le dépôt ne sera pas remboursé.
               </p>
             </article>
 
-            <article>
+            <article class="fade-in" style="transition-delay: 0.2s;">
               <h3
                 class="text-brown"
                 style="
                   font-family: var(--font-serif);
                   font-size: var(--fs-md);
                   margin-bottom: var(--space-md);
-                "
+                " data-i18n="politiques.annulation.title"
               >
                 Annulation
               </h3>
               <p
                 class="text-muted"
-                style="font-size: var(--fs-sm); line-height: 1.8"
+                style="font-size: var(--fs-sm); line-height: 1.8" data-i18n="politiques.annulation.desc"
               >
-                Un préavis d'au moins
-                <strong class="text-brown">24 heures</strong> est obligatoire
-                pour toute annulation sans frais. Passé ce délai, le dépôt est
-                perdu.
+                Un préavis d'au moins <strong class="text-brown">24 heures</strong> est obligatoire pour toute annulation sans frais. Passé ce délai, le dépôt est perdu.
               </p>
             </article>
           </div>
 
-          <div class="info-box" style="margin-top: var(--space-xl)">
+          <div class="info-box fade-in" style="margin-top: var(--space-xl)">
             <span class="info-box__icon" aria-hidden="true">ℹ</span>
-            <span>
-              Les extensions ne sont <strong>pas incluses</strong> dans les prix
-              affichés. Pour toute question, contactez-nous au
-              <a
-                href="tel:416-836-4556"
-                style="color: var(--caramel); font-weight: 600"
-                >416-836-4556</a
-              >
-              ou par email à
-              <a href="mailto:Tinidk17@gmail.com" style="color: var(--caramel)"
-                >Tinidk17@gmail.com</a
-              >.
+            <span data-i18n="politiques.info">
+              Les extensions ne sont <strong>pas incluses</strong> dans les prix affichés. Pour toute question, contactez-nous au <a href="tel:416-836-4556" style="color: var(--caramel); font-weight: 600">416-836-4556</a> ou par email à <a href="mailto:Tinidk17@gmail.com" style="color: var(--caramel)">Tinidk17@gmail.com</a>.
             </span>
           </div>
         </div>
@@ -471,29 +441,20 @@
 
           <!-- Colonne 2 : Navigation -->
           <nav aria-label="Liens du pied de page">
-            <p class="footer__heading">Navigation</p>
+            <p class="footer__heading" data-i18n="footer.nav.title">Navigation</p>
             <ul class="footer__list">
-              <li><a data-nav="accueil" href="/">Accueil</a></li>
-              <li>
-                <a data-nav="services" href="#services"
-                  >Services &amp; Tarifs</a
-                >
-              </li>
-              <li><a data-nav="a-propos" href="#a-propos">À propos</a></li>
-              <li>
-                <a data-nav="reservation" href="#reservation">Réserver</a>
-              </li>
-              <li><a data-nav="avis" href="#avis">Avis clients</a></li>
-              <li>
-                <a data-nav="politiques" href="#politiques">Politiques</a>
-              </li>
-              <li><a data-nav="contact" href="#contact">Contact</a></li>
+              <li><a data-nav="accueil" href="/" data-i18n="nav.accueil">Accueil</a></li>
+              <li><a data-nav="services" href="#services" data-i18n="nav.services">Services &amp; Tarifs</a></li>
+              <li><a data-nav="a-propos" href="#a-propos" data-i18n="nav.apropos">À propos</a></li>
+              <li><a data-nav="reservation" href="#reservation" data-i18n="nav.reserver">Réserver</a></li>
+              <li><a data-nav="politiques" href="#politiques" data-i18n="nav.politiques">Politiques</a></li>
+              <li><a data-nav="contact" href="#contact" data-i18n="nav.contact">Contact</a></li>
             </ul>
           </nav>
 
           <!-- Colonne 3 : Coordonnées -->
           <div>
-            <p class="footer__heading">Nous contacter</p>
+            <p class="footer__heading" data-i18n="footer.contact.title">Nous contacter</p>
             <ul class="footer__list">
               <li>
                 <a
@@ -534,9 +495,8 @@
 
         <!-- Barre de bas de page -->
         <div class="footer__bottom">
-          <p class="footer__copy">
-            &copy; <span id="footer-year"></span> Glow Room Studio. Tous droits
-            réservés.
+          <p class="footer__copy" data-i18n="footer.copy">
+            &copy; <span id="footer-year"></span> Glow Room Studio. Tous droits réservés.
           </p>
           <div class="footer__socials">
             <a

@@ -1,0 +1,9 @@
+User-agent: *
+Allow: /
+
+# Ne pas indexer l'admin ni les routes API
+Disallow: /admin
+Disallow: /#admin
+
+# Sitemap
+Sitemap: https://glowroomstudio.ca/sitemap.xml

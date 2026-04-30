@@ -14,6 +14,7 @@ import {
   SERVICES_HOMMES,
 } from './data.js';
 import { onPageEnter } from './router.js';
+import { updateDOM, getLang } from './i18n.js';
 
 // ─── ÉTAT CENTRAL ────────────────────────────────────────────
 
@@ -31,6 +32,7 @@ const B = {
 let _calYear     = null;
 let _calMonth    = null; // 0-indexed
 let _initialized = false;
+let _timerInterval = null;
 
 // ─── CONSTANTS ───────────────────────────────────────────────
 
@@ -76,6 +78,7 @@ function _onEnter() {
   if (B.service && B.step === 0) B.step = 1;
 
   _renderStep(B.step);
+  updateDOM();
 }
 
 // ─── RENDER ──────────────────────────────────────────────────
@@ -100,6 +103,7 @@ function _renderStep(step) {
     _refreshCalendar(root);
     if (B.date) _refreshSlots(root);
   }
+  updateDOM();
 }
 
 // ─── INDICATEUR & RÉCAPITULATIF ──────────────────────────────
@@ -154,14 +158,12 @@ function _buildS0() {
   return `
     <div class="booking-confirmation">
       <div class="booking-confirmation__icon">✂️</div>
-      <h2 class="booking-confirmation__title">Réservez votre rendez-vous</h2>
-      <p class="booking-confirmation__text">
-        Choisissez votre service, une date et finalisez en quelques étapes.
-        Un dépôt de <strong>${POLITIQUES.depot.montant}$</strong> (non remboursable)
-        est requis pour confirmer le rendez-vous.
+      <h2 class="booking-confirmation__title" data-i18n="booking.s0.title">Réservez votre rendez-vous</h2>
+      <p class="booking-confirmation__text" data-i18n="booking.s0.text">
+        Choisissez votre service, une date et finalisez en quelques étapes. Un dépôt de <strong>${POLITIQUES.depot.montant}$</strong> (non remboursable) est requis pour confirmer le rendez-vous.
       </p>
       <div style="display:flex;justify-content:center;margin-top:var(--space-xl);">
-        <button type="button" class="btn btn-dark btn--lg" data-action="start">
+        <button type="button" class="btn btn-dark btn--lg" data-action="start" data-i18n="booking.s0.btn">
           Commencer la réservation
         </button>
       </div>
@@ -174,8 +176,8 @@ function _buildS1() {
   const hasChoice = !!B.service;
 
   return `
-    <h2 class="booking-step__title">Quel service souhaitez-vous ?</h2>
-    <p class="booking-step__subtitle">Sélectionnez un service et une option pour continuer.</p>
+    <h2 class="booking-step__title" data-i18n="booking.s1.title">Quel service souhaitez-vous ?</h2>
+    <p class="booking-step__subtitle" data-i18n="booking.s1.subtitle">Sélectionnez un service et une option pour continuer.</p>
 
     <div class="services-tabs" role="tablist">
       ${['femmes', 'hommes']
@@ -186,7 +188,7 @@ function _buildS1() {
             aria-selected="${g === genre}"
             aria-controls="s1-panel-${g}"
             data-booking-tab="${g}"
-          >${g.charAt(0).toUpperCase() + g.slice(1)}</button>
+          >${t(`booking.tab.${g}`)}</button>
         `)
         .join('')}
     </div>
@@ -199,9 +201,9 @@ function _buildS1() {
     </div>
 
     <div class="booking-nav">
-      <button type="button" class="btn-back" data-action="prev">Retour</button>
+      <button type="button" class="btn-back" data-action="prev" data-i18n="booking.nav.back">Retour</button>
       <button type="button" class="btn btn-dark" data-action="next"
-        ${!hasChoice ? 'disabled aria-disabled="true"' : ''}>
+        ${!hasChoice ? 'disabled aria-disabled="true"' : ''} data-i18n="booking.nav.next">
         Continuer
       </button>
     </div>`;
@@ -231,7 +233,7 @@ function _buildServiceCard(service, genre) {
           data-duree-minutes="${v.dureeMinutes ?? ''}"
           aria-pressed="${sel}"
         >
-          <span class="service-card__variant-label">${v.label}</span>
+          <span class="service-card__variant-label" data-i18n="var.${v.id}">${v.label}</span>
           <span class="service-card__variant-price">${v.prixLabel ?? v.prix + '$'}</span>
         </button>`;
     })
@@ -239,7 +241,7 @@ function _buildServiceCard(service, genre) {
 
   return `
     <article class="service-card ${B.service?.serviceId === service.id ? 'is-selected' : ''}">
-      <h3 class="service-card__title">${service.categorie}</h3>
+      <h3 class="service-card__title" data-i18n="cat.${service.id}">${service.categorie}</h3>
       ${tags}
       <div class="service-card__variants">${variants}</div>
     </article>`;
@@ -249,8 +251,8 @@ function _buildServiceCard(service, genre) {
 function _buildS2() {
   const ready = !!(B.date && B.slot);
   return `
-    <h2 class="booking-step__title">Date &amp; Heure</h2>
-    <p class="booking-step__subtitle">Choisissez une date disponible, puis un créneau horaire.</p>
+    <h2 class="booking-step__title" data-i18n="booking.s2.title">Date &amp; Heure</h2>
+    <p class="booking-step__subtitle" data-i18n="booking.s2.subtitle">Choisissez une date disponible, puis un créneau horaire.</p>
 
     <div>
       <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:var(--space-md);">
@@ -265,9 +267,9 @@ function _buildS2() {
     <div data-slots-container></div>
 
     <div class="booking-nav">
-      <button type="button" class="btn-back" data-action="prev">Retour</button>
+      <button type="button" class="btn-back" data-action="prev" data-i18n="booking.nav.back">Retour</button>
       <button type="button" class="btn btn-dark" data-action="next"
-        ${!ready ? 'disabled aria-disabled="true"' : ''}>
+        ${!ready ? 'disabled aria-disabled="true"' : ''} data-i18n="booking.nav.next">
         Continuer
       </button>
     </div>`;
@@ -276,8 +278,8 @@ function _buildS2() {
 // S3 — Informations personnelles
 function _buildS3() {
   return `
-    <h2 class="booking-step__title">Vos informations</h2>
-    <p class="booking-step__subtitle">
+    <h2 class="booking-step__title" data-i18n="booking.s3.title">Vos informations</h2>
+    <p class="booking-step__subtitle" data-i18n="booking.s3.subtitle">
       Ces informations nous permettront de confirmer votre rendez-vous par email.
     </p>
 
@@ -285,14 +287,14 @@ function _buildS3() {
       style="display:flex;flex-direction:column;gap:var(--space-md);">
       <div class="form-row form-row--2">
         <div class="form-group">
-          <label class="form-label form-label--required" for="b-nom">Nom complet</label>
+          <label class="form-label form-label--required" for="b-nom" data-i18n="booking.s3.name">Nom complet</label>
           <input class="form-input" type="text" id="b-nom" name="nom"
             autocomplete="name" placeholder="Votre nom complet"
             value="${_esc(B.name)}" />
           <span class="form-error" id="err-nom" aria-live="polite"></span>
         </div>
         <div class="form-group">
-          <label class="form-label form-label--required" for="b-tel">Téléphone</label>
+          <label class="form-label form-label--required" for="b-tel" data-i18n="booking.s3.phone">Téléphone</label>
           <input class="form-input" type="tel" id="b-tel" name="phone"
             autocomplete="tel" placeholder="(613) 555-0123"
             value="${_esc(B.phone)}" />
@@ -300,7 +302,7 @@ function _buildS3() {
         </div>
       </div>
       <div class="form-group">
-        <label class="form-label form-label--required" for="b-email">Email</label>
+        <label class="form-label form-label--required" for="b-email" data-i18n="booking.s3.email">Email</label>
         <input class="form-input" type="email" id="b-email" name="email"
           autocomplete="email" placeholder="votre@email.com"
           value="${_esc(B.email)}" />
@@ -309,8 +311,8 @@ function _buildS3() {
     </form>
 
     <div class="booking-nav">
-      <button type="button" class="btn-back" data-action="prev">Retour</button>
-      <button type="button" class="btn btn-dark" data-action="next">Continuer</button>
+      <button type="button" class="btn-back" data-action="prev" data-i18n="booking.nav.back">Retour</button>
+      <button type="button" class="btn btn-dark" data-action="next" data-i18n="booking.nav.next">Continuer</button>
     </div>`;
 }
 
@@ -319,17 +321,17 @@ function _buildS4() {
   if (B.confirmed) return _buildS4Success();
 
   const recap = [
-    { label: 'Service',   value: `${B.service?.categorie} — ${B.service?.label}` },
-    { label: 'Date',      value: _formatDateFR(B.date) },
-    { label: 'Heure',     value: B.slot },
-    { label: 'Nom',       value: B.name },
-    { label: 'Email',     value: B.email },
-    { label: 'Téléphone', value: B.phone },
+    { label: t('booking.s4.recap.service'), value: `${B.service?.categorie} — ${B.service?.label}` },
+    { label: t('booking.s4.recap.date'),    value: _formatDateFR(B.date) },
+    { label: t('booking.s4.recap.time'),    value: B.slot },
+    { label: t('booking.s4.recap.name'),    value: B.name },
+    { label: t('booking.s4.recap.email'),   value: B.email },
+    { label: t('booking.s4.recap.phone'),   value: B.phone },
   ];
 
   return `
-    <h2 class="booking-step__title">Confirmez votre réservation</h2>
-    <p class="booking-step__subtitle">Vérifiez les informations, puis confirmez.</p>
+    <h2 class="booking-step__title" data-i18n="booking.s4.title">Confirmez votre réservation</h2>
+    <p class="booking-step__subtitle" data-i18n="booking.s4.subtitle">Vérifiez les informations, puis confirmez.</p>
 
     <div class="booking-confirmation__recap">
       ${recap
@@ -343,8 +345,7 @@ function _buildS4() {
 
     <div class="info-box" style="margin-top:var(--space-lg);">
       <span class="info-box__icon">ℹ</span>
-      <span>
-        Pour confirmer votre réservation, envoyez <strong>${POLITIQUES.depot.montant}$ CAD</strong>
+      <span data-i18n="booking.s4.interac">Pour confirmer votre réservation, envoyez <strong>${POLITIQUES.depot.montant}$ CAD</strong>
         à <strong>Tinidk17@gmail.com</strong> via Interac e-Transfer.<br>
         Indiquez votre nom complet en message.<br>
         Votre RDV sera confirmé dès réception du paiement.
@@ -352,8 +353,8 @@ function _buildS4() {
     </div>
 
     <div class="booking-nav">
-      <button type="button" class="btn-back" data-action="prev">Retour</button>
-      <button type="button" class="btn btn-gold btn--lg" data-action="confirm">
+      <button type="button" class="btn-back" data-action="prev" data-i18n="booking.nav.back">Retour</button>
+      <button type="button" class="btn btn-gold btn--lg" data-action="confirm" data-i18n="booking.s4.btn">
         Confirmer ma réservation
       </button>
     </div>`;
@@ -364,24 +365,27 @@ function _buildS4Success() {
   return `
     <div class="booking-confirmation">
       <div class="booking-confirmation__icon">✅</div>
-      <h2 class="booking-confirmation__title">Demande envoyée !</h2>
+      <h2 class="booking-confirmation__title" data-i18n="booking.s4.success.title">Demande envoyée !</h2>
       <p class="booking-confirmation__text">
-        Un email avec les instructions Interac a été envoyé à
+        <span data-i18n="booking.s4.success.text">Un email avec les instructions Interac a été envoyé à </span>
         <strong>${_esc(B.email)}</strong>.
       </p>
       <div class="info-box" style="margin-top:var(--space-md); text-align:left;">
         <span class="info-box__icon">⚠️</span>
-        <span>
+        <span data-i18n="booking.s4.success.warning">
           <strong>Vous avez 15 minutes</strong> pour envoyer le virement Interac. Passé ce délai, le créneau sera annulé.
         </span>
       </div>
+      <div class="booking-timer" style="margin-top: var(--space-md); font-size: 2rem; font-family: monospace; font-weight: bold; color: var(--caramel);">
+        ⏱️ <span id="booking-timer-display">15:00</span>
+      </div>
       <p class="booking-confirmation__text"
         style="margin-top:var(--space-md);font-size:var(--fs-sm);color:var(--muted);">
-        Référence : ${_esc(ref)}
+        <span data-i18n="booking.s4.ref">Référence</span> : ${_esc(ref)}
       </p>
       <div style="display:flex;flex-wrap:wrap;gap:var(--space-md);justify-content:center;margin-top:var(--space-xl);">
-        <button type="button" class="btn btn-ghost" data-nav="accueil">Retour à l'accueil</button>
-        <button type="button" class="btn btn-dark" data-action="rebook">Nouvelle réservation</button>
+        <button type="button" class="btn btn-ghost" data-nav="accueil" data-i18n="booking.s4.success.home">Retour à l'accueil</button>
+        <button type="button" class="btn btn-dark" data-action="rebook" data-i18n="booking.s4.success.rebook">Nouvelle réservation</button>
       </div>
     </div>`;
 }
@@ -516,6 +520,7 @@ async function _handleConfirm(root) {
         slot:       B.slot,
         phone:      B.phone,
         email:      B.email,
+        lang:       getLang()
       }),
     });
 
@@ -523,14 +528,15 @@ async function _handleConfirm(root) {
 
     B.confirmed = true;
     _renderStep(4);
-    _toast('Votre demande de réservation a bien été envoyée !', 'success');
+    _startTimer(15 * 60);
+    _toast(t('booking.toast.success'), 'success');
 
   } catch (err) {
     console.error('[booking] Erreur réservation :', err);
-    _toast('Une erreur est survenue. Veuillez réessayer.', 'error');
+    _toast(t('booking.toast.error'), 'error');
     if (btn) {
       btn.disabled    = false;
-      btn.textContent = 'Confirmer ma réservation';
+      btn.textContent = t('booking.s4.btn');
     }
   }
 }
@@ -547,15 +553,15 @@ function _validateAndAdvance(root) {
 
 function _validateS1() {
   if (!B.service) {
-    _toast('Veuillez sélectionner un service.', 'info');
+    _toast(t('booking.error.no_service'), 'info');
     return;
   }
   _goToStep(2);
 }
 
 function _validateS2() {
-  if (!B.date) { _toast('Veuillez choisir une date.', 'info');   return; }
-  if (!B.slot) { _toast('Veuillez choisir un créneau.', 'info'); return; }
+  if (!B.date) { _toast(t('booking.error.no_date'), 'info');   return; }
+  if (!B.slot) { _toast(t('booking.error.no_slot'), 'info'); return; }
   _goToStep(3);
 }
 
@@ -567,11 +573,11 @@ function _validateS3(root) {
   const email = form.querySelector('#b-email').value.trim();
 
   const errors = {};
-  if (!name)  errors.nom   = 'Votre nom est requis.';
-  if (!phone) errors.phone = 'Votre téléphone est requis.';
-  if (!email) errors.email = 'Votre email est requis.';
+  if (!name)  errors.nom   = t('booking.error.no_name');
+  if (!phone) errors.phone = t('booking.error.no_phone');
+  if (!email) errors.email = t('booking.error.no_email');
   else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email))
-    errors.email = 'Adresse email invalide.';
+    errors.email = t('booking.error.invalid_email');
 
   if (Object.keys(errors).length) {
     Object.entries(errors).forEach(([field, msg]) => {
@@ -605,7 +611,7 @@ async function _refreshSlots(root) {
   const dateAtStart = B.date;
   container.innerHTML = `
     <p style="font-size:var(--fs-sm);color:var(--muted);margin-top:var(--space-xl);" aria-live="polite">
-      Vérification des disponibilités…
+      ${t('booking.slots.loading')}
     </p>`;
 
   let busySlots = [];
@@ -629,7 +635,7 @@ function _buildSlotsHTML(busySlots = []) {
 
   return `
     <p style="font-size:var(--fs-sm);color:var(--muted);margin-top:var(--space-xl);margin-bottom:var(--space-md);">
-      Créneaux disponibles — ${_formatDateFR(B.date)}
+      ${t('booking.slots.available')} — ${_formatDateFR(B.date)}
     </p>
     <div class="booking-slots">
       ${SLOTS.map((slot) => {
@@ -701,6 +707,32 @@ function _resetState() {
     name: '', phone: '', email: '', confirmed: false,
   });
   _calYear = _calMonth = null;
+  if (_timerInterval) {
+    clearInterval(_timerInterval);
+    _timerInterval = null;
+  }
+}
+
+function _startTimer(durationSeconds) {
+  if (_timerInterval) clearInterval(_timerInterval);
+  let remaining = durationSeconds;
+  
+  const display = document.getElementById('booking-timer-display');
+  if (!display) return;
+
+  _timerInterval = setInterval(() => {
+    remaining--;
+    if (remaining < 0) {
+      clearInterval(_timerInterval);
+      display.textContent = "00:00";
+      display.style.color = "#d9534f"; // Red
+      return;
+    }
+    const m = Math.floor(remaining / 60).toString().padStart(2, '0');
+    const s = (remaining % 60).toString().padStart(2, '0');
+    display.textContent = `${m}:${s}`;
+    if (remaining <= 60) display.style.color = "#d9534f"; // Red at last minute
+  }, 1000);
 }
 
 function _toast(message, type = 'info') {

@@ -114,7 +114,10 @@ button, input, select, textarea {
   outline: none;
 }
 
-button { cursor: pointer; }
+button, a {
+  cursor: pointer;
+  touch-action: manipulation;
+}
 
 /* ─── TYPOGRAPHIE ───────────────────────────────────────────── */
 
@@ -163,6 +166,19 @@ strong { font-weight: 600; }
 
 .section {
   padding-block: var(--space-2xl);
+}
+
+/* Animations au défilement */
+.fade-in {
+  opacity: 0;
+  transform: translateY(20px);
+  transition: opacity 0.7s cubic-bezier(0.2, 0.8, 0.2, 1), transform 0.7s cubic-bezier(0.2, 0.8, 0.2, 1);
+  will-change: opacity, transform;
+}
+
+.fade-in.is-visible {
+  opacity: 1;
+  transform: translateY(0);
 }
 
 /* Trait de séparation caramel sous les titres de section */

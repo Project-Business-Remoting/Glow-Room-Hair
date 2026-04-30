@@ -11,6 +11,7 @@ import { initContact } from "./contact.js";
 import { initReviews } from "./reviews.js";
 import { initRouter } from "./router.js";
 import { initServices } from "./services.js";
+import { getLang, setLang, updateDOM } from "./i18n.js";
 
 // ─── BOOTSTRAP ───────────────────────────────────────────────
 
@@ -24,12 +25,31 @@ document.addEventListener("DOMContentLoaded", () => {
   initBooking();
   initAdmin();
 
+  _setupI18n();
+
   _setupMobileMenu();
   _setupToasts();
+  _setupScrollAnimations();
 
   // En dernier : déclenche la navigation initiale vers la page du hash courant
   initRouter();
 });
+
+// ─── I18N ────────────────────────────────────────────────────
+
+function _setupI18n() {
+  updateDOM();
+  const langToggle = document.getElementById('lang-toggle');
+  if (langToggle) {
+    langToggle.textContent = getLang() === 'fr' ? 'EN' : 'FR';
+    langToggle.addEventListener('click', () => {
+      const current = getLang();
+      const nextLang = current === 'fr' ? 'en' : 'fr';
+      setLang(nextLang);
+      langToggle.textContent = nextLang === 'fr' ? 'EN' : 'FR';
+    });
+  }
+}
 
 // ─── MENU MOBILE ─────────────────────────────────────────────
 
@@ -121,6 +141,30 @@ function _dismiss(toast) {
   toast.classList.add("is-hiding");
   // Attendre la fin de l'animation toastOut (0.22s) avant de retirer l'élément
   toast.addEventListener("animationend", () => toast.remove(), { once: true });
+}
+
+// ─── ANIMATIONS SCROLL ───────────────────────────────────────
+
+function _setupScrollAnimations() {
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        entry.target.classList.add('is-visible');
+        observer.unobserve(entry.target); // Animation jouée une seule fois
+      }
+    });
+  }, { threshold: 0.05, rootMargin: "0px 0px -40px 0px" });
+
+  const observeElements = () => {
+    document.querySelectorAll('.fade-in:not(.is-visible)').forEach(el => observer.observe(el));
+  };
+
+  observeElements();
+  // Relancer l'observation après navigation ou injection de DOM
+  document.addEventListener('router:navigate', () => setTimeout(observeElements, 100));
+  // Pour les avis et services qui s'injectent
+  const mutationObserver = new MutationObserver(() => observeElements());
+  mutationObserver.observe(document.body, { childList: true, subtree: true });
 }
 
 // ─── UTILITAIRE ──────────────────────────────────────────────

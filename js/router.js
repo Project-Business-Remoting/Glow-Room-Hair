@@ -18,7 +18,6 @@ const VALID_PAGES = [
   "a-propos",
   "services",
   "reservation",
-  "avis",
   "politiques",
   "contact",
   "admin",

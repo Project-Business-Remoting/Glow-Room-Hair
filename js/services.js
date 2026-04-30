@@ -4,6 +4,7 @@
 // ============================================================
 
 import { POLITIQUES, SERVICES_FEMMES, SERVICES_HOMMES } from "./data.js";
+import { updateDOM } from "./i18n.js";
 import { navigate, onPageEnter } from "./router.js";
 
 let _rendered = false;
@@ -24,6 +25,7 @@ function _onEnter() {
   if (!section) return;
 
   section.innerHTML = _buildHTML();
+  updateDOM();
   _bindEvents(section);
 }
 
@@ -31,10 +33,10 @@ function _buildHTML() {
   return `
     <div class="container section">
       <header class="section-header">
-        <span class="section-header__eyebrow">Nos prestations</span>
-        <h2 class="section-header__title">Services &amp; Tarifs</h2>
+        <span class="section-header__eyebrow" data-i18n="services.eyebrow">Nos prestations</span>
+        <h2 class="section-header__title" data-i18n="services.title">Services &amp; Tarifs</h2>
         <div class="divider"></div>
-        <p class="section-header__subtitle">
+        <p class="section-header__subtitle" data-i18n="services.subtitle">
           Tresses, locks et coiffures protectrices réalisées avec soin à Ottawa–Gatineau.
         </p>
       </header>
@@ -47,6 +49,7 @@ function _buildHTML() {
           aria-controls="panel-femmes"
           id="tab-femmes"
           data-tab="femmes"
+          data-i18n="services.tab.femmes"
         >Femmes</button>
         <button
           class="services-tab"
@@ -55,6 +58,7 @@ function _buildHTML() {
           aria-controls="panel-hommes"
           id="tab-hommes"
           data-tab="hommes"
+          data-i18n="services.tab.hommes"
         >Hommes</button>
       </div>
 
@@ -79,7 +83,7 @@ function _buildHTML() {
       <div class="services-page__note">
         <div class="info-box">
           <span class="info-box__icon" aria-hidden="true">ℹ</span>
-          <span>${POLITIQUES.extensions.description} Dépôt de ${POLITIQUES.depot.montant}$ requis à la réservation.</span>
+          <span data-i18n="services.note">${POLITIQUES.extensions.description} Dépôt de ${POLITIQUES.depot.montant}$ requis à la réservation.</span>
         </div>
       </div>
     </div>
@@ -88,10 +92,10 @@ function _buildHTML() {
 
 function _buildCard(service, genre) {
   const imageMap = {
-    "classiques-braids-f": "images/IMAGLOWROOM-6.jpeg",
-    "goddess-braids-f": "images/goddess-braids.jpg",
-    "french-curls-f": "images/french-curl.jpg",
-    "classiques-braids-h": "images/nattes.jpg",
+    "classiques-braids-f": "images/classique-braids.jpg",
+    "goddess-braids-f": "images/godess-braids.jpg",
+    "french-curls-f": "images/french-curls.jpg",
+    "classiques-braids-h": "images/IMAGLOWROOM-3.jpeg",
     "locks-retwist-h": "images/retwist.jpg",
     "retwist-vanille-h": "images/IMAGLOWROOM-5.jpeg",
   };
@@ -133,7 +137,7 @@ function _buildCard(service, genre) {
       data-prix-label="${v.prixLabel ?? v.prix + "$"}"
       data-genre="${genre}"
     >
-      <span class="service-card__variant-label">${v.label}</span>
+      <span class="service-card__variant-label" data-i18n="var.${v.id}">${v.label}</span>
       <span class="service-card__variant-price">${v.prixLabel ?? v.prix + "$"}</span>
     </div>
   `,
@@ -141,9 +145,9 @@ function _buildCard(service, genre) {
     .join("");
 
   return `
-    <article class="service-card" data-service-id="${service.id}">
+    <article class="service-card fade-in" data-service-id="${service.id}">
       ${photoHTML}
-      <h3 class="service-card__title">${service.categorie}</h3>
+      <h3 class="service-card__title" data-i18n="cat.${service.id}">${service.categorie}</h3>
       ${stylesTags}
       <div class="service-card__variants">${variants}</div>
     </article>
