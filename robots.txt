@@ -6,4 +6,4 @@ Disallow: /admin
 Disallow: /#admin
 
 # Sitemap
-Sitemap: https://glowroomstudio.ca/sitemap.xml
+Sitemap: https://glowroomhair.ca/sitemap.xml
