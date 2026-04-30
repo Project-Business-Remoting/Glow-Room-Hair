@@ -28,6 +28,9 @@ let _calMonth = null; // 0-indexed
 let _selectedDate = null; // YYYY-MM-DD
 let _monthCounts = new Map(); // Map<YYYY-MM-DD, count>
 let _currentListMode = { type: 'date', value: null };
+let _activeTab = 'agenda'; // 'agenda' or 'trash'
+let _statusFilter = 'all'; // 'all', 'en_attente', 'confirmé'
+let _allLoadedReservations = []; // Cache pour filtrage local
 
 export function initAdmin() {
   onPageEnter("admin", _onEnter);
@@ -105,25 +108,80 @@ async function _renderDashboard(root) {
   if (!_selectedDate) _selectedDate = _todayIso();
 
   root.innerHTML = `
-    <div style="display:flex;flex-wrap:wrap;gap:var(--space-md);align-items:center;justify-content:space-between;margin-bottom:var(--space-lg);">
-      <div style="display:flex;flex-wrap:wrap;gap:var(--space-sm);">
-        <button type="button" class="btn btn-ghost btn--sm" data-range="today">Aujourd'hui</button>
-        <button type="button" class="btn btn-ghost btn--sm" data-range="week">Semaine</button>
-        <button type="button" class="btn btn-ghost btn--sm" data-range="all">Toutes</button>
+    <!-- Top Bar -->
+    <div style="display:flex;flex-wrap:wrap;gap:var(--space-md);align-items:center;justify-content:space-between;margin-bottom:var(--space-xl);">
+      <div class="admin-tabs" style="display:flex;gap:var(--space-xs);background:var(--bg-card);padding:4px;border-radius:12px;border:1px solid var(--caramel2);">
+        <button type="button" class="admin-tab-btn ${(_activeTab === 'agenda') ? 'is-active' : ''}" data-tab="agenda">📅 Agenda</button>
+        <button type="button" class="admin-tab-btn ${(_activeTab === 'trash') ? 'is-active' : ''}" data-tab="trash">🗑️ Corbeille</button>
       </div>
+      
       <div style="display:flex;gap:var(--space-sm);align-items:center;">
-        <button type="button" class="btn btn-ghost btn--sm" data-action="smtp-test">Tester email</button>
-        <button type="button" class="btn btn-ghost btn--sm" data-action="logout">Déconnexion</button>
+        <button type="button" class="btn btn-ghost btn--sm" data-action="smtp-test">📧 Test Email</button>
+        <button type="button" class="btn btn-ghost btn--sm" data-action="logout">🚪 Déconnexion</button>
       </div>
     </div>
 
-    <div class="info-box" style="margin-bottom:var(--space-lg);">
-      <span class="info-box__icon" aria-hidden="true">ℹ</span>
-      <span>
-        Actions disponibles : confirmer un paiement, annuler une réservation, bloquer le créneau 16h.
-      </span>
+    <!-- Main View -->
+    <div id="admin-view-content">
+      ${_activeTab === 'agenda' ? _buildAgendaHTML() : _buildTrashHTML()}
     </div>
+  `;
 
+  // Global styles for admin tabs if not in CSS
+  if (!document.getElementById('admin-styles')) {
+    const style = document.createElement('style');
+    style.id = 'admin-styles';
+    style.innerHTML = `
+      .admin-tab-btn {
+        padding: 8px 20px;
+        border: none;
+        background: transparent;
+        color: var(--muted);
+        border-radius: 8px;
+        cursor: pointer;
+        font-weight: 600;
+        font-size: var(--fs-xs);
+        transition: all 0.3s ease;
+      }
+      .admin-tab-btn.is-active {
+        background: var(--gold);
+        color: white;
+        box-shadow: 0 4px 10px rgba(188, 142, 83, 0.2);
+      }
+      .filter-btn {
+        padding: 6px 12px;
+        border-radius: 20px;
+        border: 1px solid var(--caramel2);
+        background: white;
+        font-size: 12px;
+        cursor: pointer;
+        transition: all 0.2s;
+      }
+      .filter-btn.is-active {
+        background: var(--brown);
+        color: white;
+        border-color: var(--brown);
+      }
+    `;
+    document.head.appendChild(style);
+  }
+
+  _bindEvents(root);
+  
+  if (_activeTab === 'agenda') {
+    const dateInput = root.querySelector("#block-date");
+    if (dateInput) dateInput.value = _selectedDate;
+    _refreshCalendar(root);
+    await _loadMonthCounts();
+    _refreshCalendar(root);
+    await _loadReservationsForDate(root, _selectedDate);
+  } else {
+    _loadTrash(root);
+  }
+}
+
+function _buildAgendaHTML() {
+  return `
     <div class="grid grid--2" style="align-items:start;gap:var(--space-xl);margin-bottom:var(--space-xl);">
       <div>
         <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:var(--space-md);">
@@ -135,32 +193,61 @@ async function _renderDashboard(root) {
         <div class="booking-calendar" data-cal-grid></div>
 
         <div style="margin-top:var(--space-md);display:flex;flex-wrap:wrap;gap:var(--space-md);align-items:end;">
-          <div class="form-group" style="min-width:240px;">
-            <label class="form-label" for="block-date">Date sélectionnée</label>
+          <div class="form-group" style="min-width:200px;margin-bottom:0;">
+            <label class="form-label" for="block-date">Date cible</label>
             <input class="form-input" type="date" id="block-date" />
           </div>
-          <button type="button" class="btn btn-dark" data-action="block-16">Bloquer 16h</button>
-          <button type="button" class="btn btn-ghost" data-action="load-day">Voir réservations du jour</button>
+          <button type="button" class="btn btn-dark" data-action="block-16" style="height:44px;">Bloquer 16h</button>
         </div>
       </div>
 
-      <div>
-        <div class="info-box" style="margin-bottom:var(--space-md);">
-          <span class="info-box__icon" aria-hidden="true">🗓</span>
-          <span>
-            Cliquez une date pour la sélectionner. "Voir réservations du jour" filtre la liste sur cette date.
-          </span>
+      <div class="admin-controls">
+        <h3 style="font-family:var(--font-serif);color:var(--brown);margin-bottom:var(--space-md);">Filtres & Affichage</h3>
+        <div style="display:flex;flex-wrap:wrap;gap:var(--space-sm);margin-bottom:var(--space-lg);">
+          <button type="button" class="btn btn-ghost btn--sm" data-range="today">Aujourd'hui</button>
+          <button type="button" class="btn btn-ghost btn--sm" data-range="week">Semaine</button>
+          <button type="button" class="btn btn-ghost btn--sm" data-range="all">Toutes les actives</button>
+        </div>
+        
+        <div style="background:var(--bg-card);padding:var(--space-md);border-radius:12px;border:1px solid var(--caramel2);">
+           <p style="font-weight:600;font-size:var(--fs-xs);margin-bottom:10px;">Statut :</p>
+           <div style="display:flex;gap:8px;">
+             <button class="filter-btn ${_statusFilter === 'all' ? 'is-active' : ''}" data-status="all">Tout</button>
+             <button class="filter-btn ${_statusFilter === 'en_attente' ? 'is-active' : ''}" data-status="en_attente">En attente</button>
+             <button class="filter-btn ${_statusFilter === 'confirmé' ? 'is-active' : ''}" data-status="confirmé">Confirmé</button>
+           </div>
         </div>
       </div>
     </div>
 
     <div id="admin-list" aria-live="polite"></div>
   `;
+}
 
-  const dateInput = root.querySelector("#block-date");
-  if (dateInput) dateInput.value = _selectedDate;
+function _buildTrashHTML() {
+  return `
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:var(--space-lg);">
+      <h3 style="font-family:var(--font-serif);color:var(--brown);">Réservations annulées</h3>
+      <button type="button" class="btn btn-dark btn--sm" data-action="empty-trash">💥 Vider la corbeille</button>
+    </div>
+    <div id="admin-trash-list" aria-live="polite"></div>
+  `;
+}
 
-  root.addEventListener("click", (e) => {
+function _bindEvents(root) {
+  // Use a fresh listener to avoid multiple bindings
+  const newRoot = root.cloneNode(true);
+  root.parentNode.replaceChild(newRoot, root);
+  const dashboard = newRoot;
+
+  dashboard.addEventListener("click", async (e) => {
+    const tabBtn = e.target.closest('[data-tab]');
+    if (tabBtn) {
+      _activeTab = tabBtn.dataset.tab;
+      _renderDashboard(dashboard);
+      return;
+    }
+
     const logout = e.target.closest('[data-action="logout"]');
     if (logout) {
       sessionStorage.removeItem("admin_password");
@@ -176,41 +263,41 @@ async function _renderDashboard(root) {
 
     const rangeBtn = e.target.closest("[data-range]");
     if (rangeBtn) {
-      _loadReservations(root, rangeBtn.dataset.range);
+      _loadReservations(dashboard, rangeBtn.dataset.range);
+      return;
+    }
+
+    const statusBtn = e.target.closest("[data-status]");
+    if (statusBtn) {
+      _statusFilter = statusBtn.dataset.status;
+      _applyLocalFilters(dashboard);
       return;
     }
 
     const prev = e.target.closest('[data-action="cal-prev"]');
     if (prev) {
-      _changeMonth(-1, root);
+      _changeMonth(-1, dashboard);
       return;
     }
 
     const next = e.target.closest('[data-action="cal-next"]');
     if (next) {
-      _changeMonth(+1, root);
+      _changeMonth(+1, dashboard);
       return;
     }
 
     const day = e.target.closest("[data-cal-day]");
     if (day) {
-      _selectDate(day.dataset.calDay, root);
+      _selectDate(day.dataset.calDay, dashboard);
+      _loadReservationsForDate(dashboard, day.dataset.calDay);
       return;
     }
 
     const blockBtn = e.target.closest('[data-action="block-16"]');
     if (blockBtn) {
-      const date = root.querySelector("#block-date")?.value;
+      const date = dashboard.querySelector("#block-date")?.value;
       if (!date) return _toast("Veuillez choisir une date.", "info");
       _blockSlot(date, "16:00");
-      return;
-    }
-
-    const loadDay = e.target.closest('[data-action="load-day"]');
-    if (loadDay) {
-      const date = root.querySelector("#block-date")?.value;
-      if (!date) return _toast("Veuillez choisir une date.", "info");
-      _loadReservationsForDate(root, date);
       return;
     }
 
@@ -225,12 +312,23 @@ async function _renderDashboard(root) {
       _patchReservation(cancelBtn.dataset.id, "annuler");
       return;
     }
-  });
 
-  _refreshCalendar(root);
-  await _loadMonthCounts();
-  _refreshCalendar(root);
-  await _loadReservationsForDate(root, _selectedDate);
+    const deleteBtn = e.target.closest('[data-action="delete"]');
+    if (deleteBtn) {
+      if (confirm("Supprimer définitivement cette réservation ?")) {
+        _deleteReservation(deleteBtn.dataset.id, dashboard);
+      }
+      return;
+    }
+
+    const emptyTrash = e.target.closest('[data-action="empty-trash"]');
+    if (emptyTrash) {
+      if (confirm("Voulez-vous vraiment vider la corbeille ? Cette action est irréversible.")) {
+        _emptyTrash(dashboard);
+      }
+      return;
+    }
+  });
 }
 
 async function _smtpTest() {
@@ -251,7 +349,7 @@ async function _smtpTest() {
     _toast("Email de test envoyé.", "success");
   } catch (err) {
     console.error("[admin] smtpTest:", err);
-    _toast("Envoi test impossible (voir logs backend).", "error");
+    _toast("Envoi test impossible.", "error");
   }
 }
 
@@ -284,15 +382,12 @@ function _refreshCalendar(root) {
   const first = new Date(_calYear, _calMonth, 1);
   const last = new Date(_calYear, _calMonth + 1, 0);
 
-  // JS: 0=Dim..6=Sam, on veut démarrer lundi
   const jsDay = first.getDay();
-  const offset = (jsDay + 6) % 7; // lun=0 ... dim=6
+  const offset = (jsDay + 6) % 7;
 
   const cells = [];
   for (let i = 0; i < offset; i++) {
-    cells.push(
-      `<div class="booking-calendar__day is-empty" aria-hidden="true"></div>`,
-    );
+    cells.push(`<div class="booking-calendar__day is-empty" aria-hidden="true"></div>`);
   }
 
   for (let d = 1; d <= last.getDate(); d++) {
@@ -300,7 +395,7 @@ function _refreshCalendar(root) {
     const isSelected = iso === _selectedDate;
     const count = _monthCounts.get(iso) || 0;
     const badge = count
-      ? `<span style="display:inline-block;min-width:18px;padding:2px 6px;border-radius:999px;background:var(--caramel2);color:var(--brown);font-size:12px;line-height:1;">${count}</span>`
+      ? `<span style="display:inline-block;min-width:18px;padding:2px 6px;border-radius:999px;background:var(--caramel2);color:var(--brown);font-size:10px;line-height:1;">${count}</span>`
       : "";
 
     cells.push(`
@@ -315,10 +410,7 @@ function _refreshCalendar(root) {
     `);
   }
 
-  const head = DAY_ABBREVS.map(
-    (d) => `<div class="booking-calendar__head" aria-hidden="true">${d}</div>`,
-  ).join("");
-
+  const head = DAY_ABBREVS.map(d => `<div class="booking-calendar__head" aria-hidden="true">${d}</div>`).join("");
   grid.innerHTML = `${head}${cells.join("")}`;
 }
 
@@ -338,28 +430,19 @@ async function _loadMonthCounts() {
     url.searchParams.set("end", end);
 
     const res = await fetch(url.toString(), { headers: _adminHeaders() });
-    if (!res.ok) {
-      if (res.status === 401) {
-        sessionStorage.removeItem("admin_password");
-        _toast("Mot de passe invalide.", "error");
-        return _render();
-      }
-      throw new Error(await res.text());
-    }
+    if (!res.ok) throw new Error();
 
     const data = await res.json();
-    const reservations = Array.isArray(data.reservations)
-      ? data.reservations
-      : [];
+    const reservations = Array.isArray(data.reservations) ? data.reservations : [];
     const map = new Map();
     for (const r of reservations) {
+      if (_isCancelledStatus(r.status)) continue;
       const date = String(r?.date || "");
       if (!date) continue;
       map.set(date, (map.get(date) || 0) + 1);
     }
     _monthCounts = map;
-  } catch (err) {
-    console.error("[admin] loadMonthCounts:", err);
+  } catch {
     _monthCounts = new Map();
   }
 }
@@ -368,7 +451,7 @@ async function _loadReservationsForDate(root, date) {
   _currentListMode = { type: 'date', value: date };
   const listEl = root.querySelector("#admin-list");
   if (!listEl) return;
-  listEl.innerHTML = `<p style="font-size:var(--fs-sm);color:var(--muted);">Chargement…</p>`;
+  listEl.innerHTML = `<p style="font-size:var(--fs-sm);color:var(--muted);text-align:center;">Chargement de l'agenda…</p>`;
 
   try {
     const url = new URL(`${BACKEND_URL}/admin/reservations`);
@@ -376,33 +459,13 @@ async function _loadReservationsForDate(root, date) {
     url.searchParams.set("end", date);
 
     const res = await fetch(url.toString(), { headers: _adminHeaders() });
-
-    if (!res.ok) {
-      if (res.status === 401) {
-        sessionStorage.removeItem("admin_password");
-        _toast("Mot de passe invalide.", "error");
-        return _render();
-      }
-      throw new Error(await res.text());
-    }
+    if (!res.ok) throw new Error();
 
     const data = await res.json();
-    const reservations = Array.isArray(data.reservations)
-      ? data.reservations
-      : [];
-
-    reservations.sort((a, b) => {
-      return String(a.time || a.slot || "").localeCompare(
-        String(b.time || b.slot || ""),
-      );
-    });
-
-    listEl.innerHTML = reservations.length
-      ? reservations.map(_renderReservationCard).join("")
-      : `<p style="font-size:var(--fs-sm);color:var(--muted);">Aucune réservation pour ${_esc(date)}.</p>`;
-  } catch (err) {
-    console.error("[admin] loadReservationsForDate:", err);
-    listEl.innerHTML = `<p style="font-size:var(--fs-sm);color:var(--muted);">Erreur de chargement.</p>`;
+    _allLoadedReservations = Array.isArray(data.reservations) ? data.reservations : [];
+    _applyLocalFilters(root);
+  } catch {
+    listEl.innerHTML = `<p style="color:var(--error);text-align:center;">Erreur réseau.</p>`;
   }
 }
 
@@ -410,10 +473,7 @@ async function _loadReservations(root, range) {
   _currentListMode = { type: 'range', value: range };
   const listEl = root.querySelector("#admin-list");
   if (!listEl) return;
-
-  listEl.innerHTML = `
-    <p style="font-size:var(--fs-sm);color:var(--muted);">Chargement…</p>
-  `;
+  listEl.innerHTML = `<p style="font-size:var(--fs-sm);color:var(--muted);text-align:center;">Chargement…</p>`;
 
   const { start, end } = _rangeToDates(range);
 
@@ -422,82 +482,133 @@ async function _loadReservations(root, range) {
     if (start) url.searchParams.set("start", start);
     if (end) url.searchParams.set("end", end);
 
-    const res = await fetch(url.toString(), {
-      headers: _adminHeaders(),
-    });
-
-    if (!res.ok) {
-      if (res.status === 401) {
-        sessionStorage.removeItem("admin_password");
-        _toast("Mot de passe invalide.", "error");
-        return _render();
-      }
-      throw new Error(await res.text());
-    }
+    const res = await fetch(url.toString(), { headers: _adminHeaders() });
+    if (!res.ok) throw new Error();
 
     const data = await res.json();
-    const reservations = Array.isArray(data.reservations)
-      ? data.reservations
-      : [];
-
-    reservations.sort((a, b) => {
-      const da = String(a.date || "");
-      const db = String(b.date || "");
-      if (da !== db) return da.localeCompare(db);
-      return String(a.time || a.slot || "").localeCompare(
-        String(b.time || b.slot || ""),
-      );
-    });
-
-    listEl.innerHTML = reservations.length
-      ? reservations.map(_renderReservationCard).join("")
-      : `<p style="font-size:var(--fs-sm);color:var(--muted);">Aucune réservation.</p>`;
-  } catch (err) {
-    console.error("[admin] loadReservations:", err);
-    listEl.innerHTML = `<p style="font-size:var(--fs-sm);color:var(--muted);">Erreur de chargement.</p>`;
+    _allLoadedReservations = Array.isArray(data.reservations) ? data.reservations : [];
+    _applyLocalFilters(root);
+  } catch {
+    listEl.innerHTML = `<p style="color:var(--error);text-align:center;">Erreur réseau.</p>`;
   }
 }
 
+async function _loadTrash(root) {
+  const listEl = root.querySelector("#admin-trash-list");
+  if (!listEl) return;
+  listEl.innerHTML = `<p style="font-size:var(--fs-sm);color:var(--muted);text-align:center;">Ouverture de la corbeille…</p>`;
+
+  try {
+    const url = new URL(`${BACKEND_URL}/admin/reservations`);
+    const res = await fetch(url.toString(), { headers: _adminHeaders() });
+    if (!res.ok) throw new Error();
+
+    const data = await res.json();
+    const all = Array.isArray(data.reservations) ? data.reservations : [];
+    const cancelled = all.filter(r => _isCancelledStatus(r.status));
+    
+    // Sort by createdAt (newest first)
+    cancelled.sort((a,b) => (b.createdAt || "").localeCompare(a.createdAt || ""));
+
+    listEl.innerHTML = cancelled.length
+      ? cancelled.map(_renderReservationCard).join("")
+      : `<p style="font-size:var(--fs-sm);color:var(--muted);text-align:center;padding:var(--space-xl);">La corbeille est vide. 🍃</p>`;
+  } catch {
+    listEl.innerHTML = `<p style="color:var(--error);text-align:center;">Erreur réseau.</p>`;
+  }
+}
+
+function _applyLocalFilters(root) {
+  const listEl = root.querySelector("#admin-list");
+  if (!listEl) return;
+
+  // 1. Filter out cancelled (agenda only shows active)
+  let filtered = _allLoadedReservations.filter(r => !_isCancelledStatus(r.status));
+
+  // 2. Filter by status
+  if (_statusFilter !== 'all') {
+    filtered = filtered.filter(r => r.status === _statusFilter);
+  }
+
+  // 3. Sort by priority (date then time)
+  filtered.sort((a, b) => {
+    const da = String(a.date || "");
+    const db = String(b.date || "");
+    if (da !== db) return da.localeCompare(db);
+    return String(a.time || a.slot || "").localeCompare(String(b.time || b.slot || ""));
+  });
+
+  // 4. Highlight Filter Buttons
+  root.querySelectorAll('[data-status]').forEach(btn => {
+    btn.classList.toggle('is-active', btn.dataset.status === _statusFilter);
+  });
+
+  listEl.innerHTML = filtered.length
+    ? filtered.map(_renderReservationCard).join("")
+    : `<div style="text-align:center;padding:var(--space-xl);background:rgba(0,0,0,0.02);border-radius:12px;">
+         <p style="font-size:var(--fs-sm);color:var(--muted);">Aucune réservation trouvée avec ces critères.</p>
+       </div>`;
+}
+
 function _renderReservationCard(r) {
-  const status = String(r.status || "—");
+  const status = String(r.status || "en_attente");
   const id = String(r.id || "");
   const isCancelled = _isCancelledStatus(status);
-  const canConfirm = !isCancelled && status !== "confirmé";
+  const isConfirmed = status === 'confirmé';
+  const lang = r.lang === 'en' ? '🇬🇧 EN' : '🇫🇷 FR';
 
-  const rows = [
-    ["Statut", status],
-    ["Client", r.clientName],
-    ["Service", r.service],
-    ["Date", r.date],
-    ["Heure", r.time || r.slot],
-    ["Téléphone", r.phone],
-    ["Email", r.email],
-  ];
+  let statusBadge = "";
+  if (isCancelled) statusBadge = `<span style="color:#d9534f;font-weight:700;font-size:10px;text-transform:uppercase;border:1px solid #d9534f;padding:2px 6px;border-radius:4px;">Annulé</span>`;
+  else if (isConfirmed) statusBadge = `<span style="color:#5cb85c;font-weight:700;font-size:10px;text-transform:uppercase;border:1px solid #5cb85c;padding:2px 6px;border-radius:4px;">Confirmé</span>`;
+  else statusBadge = `<span style="color:var(--brown);font-weight:700;font-size:10px;text-transform:uppercase;border:1px solid var(--brown);padding:2px 6px;border-radius:4px;">En attente</span>`;
 
   return `
-    <div class="booking-confirmation" style="margin-bottom:var(--space-lg);">
-      <h3 class="booking-confirmation__title" style="font-size:var(--fs-md);">Réservation</h3>
-      <p class="booking-confirmation__text" style="font-size:var(--fs-xs);color:var(--muted);margin-top:0;">ID : ${_esc(id)}</p>
+    <div class="booking-confirmation fade-in" style="margin-bottom:var(--space-lg);border:1px solid var(--caramel2);box-shadow:none;text-align:left;">
+      <div style="display:flex;justify-content:space-between;align-items:start;margin-bottom:15px;">
+        <div>
+          <h3 style="font-size:var(--fs-md);color:var(--brown);margin:0;">${_esc(r.clientName)}</h3>
+          <p style="font-size:11px;color:var(--muted);margin:0;">ID: ${_esc(id)} | ${lang}</p>
+        </div>
+        ${statusBadge}
+      </div>
 
-      <div class="booking-confirmation__recap">
-        ${rows
-          .map(
-            ([label, value]) => `
-            <div class="booking-confirmation__recap-row">
-              <span class="booking-confirmation__recap-label">${_esc(label)}</span>
-              <span class="booking-confirmation__recap-value">${_esc(String(value ?? "—"))}</span>
-            </div>`,
-          )
-          .join("")}
+      <div class="booking-confirmation__recap" style="background:var(--bg-card);border:none;padding:15px;">
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;">
+          <div>
+            <p style="font-size:10px;text-transform:uppercase;color:var(--muted);margin:0;">Service</p>
+            <p style="font-size:var(--fs-xs);font-weight:600;margin:0;">${_esc(r.service)}</p>
+          </div>
+          <div>
+            <p style="font-size:10px;text-transform:uppercase;color:var(--muted);margin:0;">Date & Heure</p>
+            <p style="font-size:var(--fs-xs);font-weight:600;margin:0;">${_esc(r.date)} à ${_esc(r.time || r.slot)}</p>
+          </div>
+          <div>
+            <p style="font-size:10px;text-transform:uppercase;color:var(--muted);margin:0;">Contact</p>
+            <p style="font-size:var(--fs-xs);margin:0;">${_esc(r.phone || "—")}</p>
+            <p style="font-size:var(--fs-xs);margin:0;">${_esc(r.email || "—")}</p>
+          </div>
+          <div>
+             <p style="font-size:10px;text-transform:uppercase;color:var(--muted);margin:0;">Dépôt</p>
+             <p style="font-size:var(--fs-xs);margin:0;">${r.amountPaid ? (r.amountPaid/100).toFixed(2)+'$' : '25.00$ (Prévu)'}</p>
+          </div>
+        </div>
       </div>
 
       <div style="display:flex;flex-wrap:wrap;gap:var(--space-sm);justify-content:flex-end;margin-top:var(--space-md);">
-        <button type="button" class="btn btn-ghost btn--sm" data-action="cancel" data-id="${_escAttr(id)}" ${isCancelled ? 'disabled aria-disabled="true"' : ""}>
-          Annuler
-        </button>
-        <button type="button" class="btn btn-dark btn--sm" data-action="confirm" data-id="${_escAttr(id)}" ${!canConfirm ? 'disabled aria-disabled="true"' : ""}>
-          Confirmer paiement
-        </button>
+        ${isCancelled ? `
+          <button type="button" class="btn btn-ghost btn--sm" data-action="delete" data-id="${_escAttr(id)}" style="color:#d9534f;">
+            Supprimer définitivement
+          </button>
+        ` : `
+          <button type="button" class="btn btn-ghost btn--sm" data-action="cancel" data-id="${_escAttr(id)}">
+            Annuler
+          </button>
+          ${!isConfirmed ? `
+            <button type="button" class="btn btn-dark btn--sm" data-action="confirm" data-id="${_escAttr(id)}">
+              Confirmer paiement
+            </button>
+          ` : ''}
+        `}
       </div>
     </div>`;
 }
@@ -507,8 +618,8 @@ async function _patchReservation(id, action) {
 
   let body = null;
   if (action === "annuler") {
-    const reason = prompt("Raison de l'annulation (sera envoyée au client) :\nLaissez vide pour la raison par défaut (Délai de paiement dépassé).", "Délai de paiement de 15 minutes dépassé.");
-    if (reason === null) return; // L'utilisateur a cliqué sur Annuler dans le prompt
+    const reason = prompt("Raison de l'annulation (sera envoyée au client) :\nLaissez vide pour la raison par défaut.", "Délai de paiement de 15 minutes dépassé.");
+    if (reason === null) return;
     if (reason.trim()) body = JSON.stringify({ reason: reason.trim() });
   }
 
@@ -516,42 +627,62 @@ async function _patchReservation(id, action) {
     const headers = _adminHeaders();
     if (body) headers["Content-Type"] = "application/json";
 
-    const res = await fetch(
-      `${BACKEND_URL}/reservation/${encodeURIComponent(id)}/${action}`,
-      {
-        method: "PATCH",
-        headers,
-        body,
-      },
-    );
+    const res = await fetch(`${BACKEND_URL}/reservation/${encodeURIComponent(id)}/${action}`, {
+      method: "PATCH",
+      headers,
+      body,
+    });
 
-    if (!res.ok) {
-      if (res.status === 401) {
-        sessionStorage.removeItem("admin_password");
-        _toast("Mot de passe invalide.", "error");
-        return _render();
-      }
-      throw new Error(await res.text());
-    }
+    if (!res.ok) throw new Error();
 
-    _toast(
-      action === "confirmer"
-        ? "Réservation confirmée."
-        : "Réservation annulée.",
-      "success",
-    );
-
-    const root = document.getElementById("admin-root");
-    if (root) {
-      if (_currentListMode.type === 'range') {
-        _loadReservations(root, _currentListMode.value);
-      } else {
-        _loadReservationsForDate(root, _currentListMode.value || _selectedDate);
-      }
-    }
+    _toast(action === "confirmer" ? "Réservation confirmée." : "Réservation annulée.", "success");
+    _refreshView();
   } catch (err) {
-    console.error("[admin] patchReservation:", err);
-    _toast("Action impossible. Réessayez.", "error");
+    _toast("Action impossible.", "error");
+  }
+}
+
+async function _deleteReservation(id, root) {
+  try {
+    const res = await fetch(`${BACKEND_URL}/admin/reservations/${encodeURIComponent(id)}`, {
+      method: "DELETE",
+      headers: _adminHeaders(),
+    });
+    if (!res.ok) throw new Error();
+    _toast("Réservation supprimée.", "success");
+    _loadTrash(root);
+  } catch {
+    _toast("Erreur suppression.", "error");
+  }
+}
+
+async function _emptyTrash(root) {
+  try {
+    const res = await fetch(`${BACKEND_URL}/admin/reservations/trash`, {
+      method: "DELETE",
+      headers: _adminHeaders(),
+    });
+    if (!res.ok) throw new Error();
+    const data = await res.json();
+    _toast(`${data.deletedCount} réservations supprimées.`, "success");
+    _loadTrash(root);
+  } catch {
+    _toast("Erreur vidage corbeille.", "error");
+  }
+}
+
+function _refreshView() {
+  const root = document.getElementById("admin-root");
+  if (!root) return;
+  if (_activeTab === 'agenda') {
+    if (_currentListMode.type === 'range') {
+      _loadReservations(root, _currentListMode.value);
+    } else {
+      _loadReservationsForDate(root, _currentListMode.value || _selectedDate);
+    }
+    _loadMonthCounts().then(() => _refreshCalendar(root));
+  } else {
+    _loadTrash(root);
   }
 }
 
@@ -562,41 +693,22 @@ async function _blockSlot(date, slot) {
       headers: { ..._adminHeaders(), "Content-Type": "application/json" },
       body: JSON.stringify({ date, slot, reason: "admin" }),
     });
-
-    if (!res.ok) {
-      if (res.status === 401) {
-        sessionStorage.removeItem("admin_password");
-        _toast("Mot de passe invalide.", "error");
-        return _render();
-      }
-      throw new Error(await res.text());
-    }
-
+    if (!res.ok) throw new Error();
     _toast(`Créneau ${slot} bloqué pour ${date}.`, "success");
-  } catch (err) {
-    console.error("[admin] blockSlot:", err);
+  } catch {
     _toast("Blocage impossible.", "error");
   }
 }
 
 function _adminHeaders() {
   const pwd = sessionStorage.getItem("admin_password") || "";
-  return {
-    "X-Admin-Password": pwd,
-  };
+  return { "X-Admin-Password": pwd };
 }
 
 function _rangeToDates(range) {
   const today = _todayIso();
-
-  if (range === "today") {
-    return { start: today, end: today };
-  }
-
-  if (range === "week") {
-    return { start: today, end: _addDaysIso(today, 6) };
-  }
-
+  if (range === "today") return { start: today, end: today };
+  if (range === "week") return { start: today, end: _addDaysIso(today, 6) };
   return { start: null, end: null };
 }
 
@@ -619,22 +731,15 @@ function _addDaysIso(iso, days) {
 
 function _isCancelledStatus(status) {
   const s = String(status || "").toLowerCase();
-  return (
-    s === "annulé" || s === "annule" || s === "cancelled" || s === "canceled"
-  );
+  return (s === "annulé" || s === "annule" || s === "cancelled" || s === "canceled");
 }
 
 function _toast(message, type = "info") {
-  document.dispatchEvent(
-    new CustomEvent("app:toast", { detail: { message, type } }),
-  );
+  document.dispatchEvent(new CustomEvent("app:toast", { detail: { message, type } }));
 }
 
 function _esc(str) {
-  return String(str ?? "")
-    .replace(/&/g, "&amp;")
-    .replace(/</g, "&lt;")
-    .replace(/>/g, "&gt;");
+  return String(str ?? "").replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
 }
 
 function _escAttr(str) {
