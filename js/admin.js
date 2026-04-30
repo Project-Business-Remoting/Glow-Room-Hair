@@ -110,7 +110,7 @@ async function _renderDashboard(root) {
   root.innerHTML = `
     <!-- Top Bar -->
     <div style="display:flex;flex-wrap:wrap;gap:var(--space-md);align-items:center;justify-content:space-between;margin-bottom:var(--space-xl);">
-      <div class="admin-tabs" style="display:flex;gap:var(--space-xs);background:var(--bg-card);padding:4px;border-radius:12px;border:1px solid var(--caramel2);">
+      <div class="admin-tabs" style="display:flex;gap:var(--space-xs);background:var(--bg-card);padding:4px;border-radius:12px;border:1px solid rgba(194, 132, 72, 0.3);">
         <button type="button" class="admin-tab-btn ${(_activeTab === 'agenda') ? 'is-active' : ''}" data-tab="agenda">Agenda</button>
         <button type="button" class="admin-tab-btn ${(_activeTab === 'trash') ? 'is-active' : ''}" data-tab="trash">Corbeille</button>
       </div>
@@ -142,10 +142,14 @@ async function _renderDashboard(root) {
         font-size: var(--fs-xs);
         transition: all 0.3s ease;
       }
+      .admin-tab-btn:hover {
+        background: rgba(194, 132, 72, 0.1);
+        color: var(--caramel);
+      }
       .admin-tab-btn.is-active {
-        background: var(--gold);
+        background: var(--caramel);
         color: white;
-        box-shadow: 0 4px 10px rgba(188, 142, 83, 0.2);
+        box-shadow: 0 4px 10px rgba(194, 132, 72, 0.25);
       }
       .filter-btn {
         padding: 6px 12px;
@@ -155,6 +159,11 @@ async function _renderDashboard(root) {
         font-size: 12px;
         cursor: pointer;
         transition: all 0.2s;
+        color: var(--muted);
+      }
+      .filter-btn:hover {
+        border-color: var(--caramel);
+        color: var(--caramel);
       }
       .filter-btn.is-active {
         background: var(--brown);
@@ -234,16 +243,14 @@ function _buildTrashHTML() {
 }
 
 function _bindEvents(root) {
-  // Use a fresh listener to avoid multiple bindings
-  const newRoot = root.cloneNode(true);
-  root.parentNode.replaceChild(newRoot, root);
-  const dashboard = newRoot;
+  if (root.dataset.bound) return;
+  root.dataset.bound = "true";
 
-  dashboard.addEventListener("click", async (e) => {
+  root.addEventListener("click", async (e) => {
     const tabBtn = e.target.closest('[data-tab]');
     if (tabBtn) {
       _activeTab = tabBtn.dataset.tab;
-      _renderDashboard(dashboard);
+      _renderDashboard(root);
       return;
     }
 
@@ -256,39 +263,39 @@ function _bindEvents(root) {
 
     const rangeBtn = e.target.closest("[data-range]");
     if (rangeBtn) {
-      _loadReservations(dashboard, rangeBtn.dataset.range);
+      _loadReservations(root, rangeBtn.dataset.range);
       return;
     }
 
     const statusBtn = e.target.closest("[data-status]");
     if (statusBtn) {
       _statusFilter = statusBtn.dataset.status;
-      _applyLocalFilters(dashboard);
+      _applyLocalFilters(root);
       return;
     }
 
     const prev = e.target.closest('[data-action="cal-prev"]');
     if (prev) {
-      _changeMonth(-1, dashboard);
+      _changeMonth(-1, root);
       return;
     }
 
     const next = e.target.closest('[data-action="cal-next"]');
     if (next) {
-      _changeMonth(+1, dashboard);
+      _changeMonth(+1, root);
       return;
     }
 
     const day = e.target.closest("[data-cal-day]");
     if (day) {
-      _selectDate(day.dataset.calDay, dashboard);
-      _loadReservationsForDate(dashboard, day.dataset.calDay);
+      _selectDate(day.dataset.calDay, root);
+      _loadReservationsForDate(root, day.dataset.calDay);
       return;
     }
 
     const blockBtn = e.target.closest('[data-action="block-16"]');
     if (blockBtn) {
-      const date = dashboard.querySelector("#block-date")?.value;
+      const date = root.querySelector("#block-date")?.value;
       if (!date) return _toast("Veuillez choisir une date.", "info");
       _blockSlot(date, "16:00");
       return;
@@ -309,7 +316,7 @@ function _bindEvents(root) {
     const deleteBtn = e.target.closest('[data-action="delete"]');
     if (deleteBtn) {
       if (confirm("Supprimer définitivement cette réservation ?")) {
-        _deleteReservation(deleteBtn.dataset.id, dashboard);
+        _deleteReservation(deleteBtn.dataset.id, root);
       }
       return;
     }
@@ -317,7 +324,7 @@ function _bindEvents(root) {
     const emptyTrash = e.target.closest('[data-action="empty-trash"]');
     if (emptyTrash) {
       if (confirm("Voulez-vous vraiment vider la corbeille ? Cette action est irréversible.")) {
-        _emptyTrash(dashboard);
+        _emptyTrash(root);
       }
       return;
     }
@@ -381,7 +388,7 @@ function _refreshCalendar(root) {
     `);
   }
 
-  const head = DAY_ABBREVS.map(d => `<div class="booking-calendar__head" aria-hidden="true">${d}</div>`).join("");
+  const head = DAY_ABBREVS.map(d => `<div class="booking-calendar__day-name" aria-hidden="true">${d}</div>`).join("");
   grid.innerHTML = `${head}${cells.join("")}`;
 }
 
@@ -534,7 +541,7 @@ function _renderReservationCard(r) {
   else statusBadge = `<span style="color:var(--brown);font-weight:700;font-size:10px;text-transform:uppercase;border:1px solid var(--brown);padding:2px 6px;border-radius:4px;">En attente</span>`;
 
   return `
-    <div class="booking-confirmation fade-in" style="margin-bottom:var(--space-lg);border:1px solid rgba(89,60,31,0.15);box-shadow:0 8px 24px rgba(89,60,31,0.06);text-align:left;background:#fff;">
+    <div class="booking-confirmation fade-in" style="margin-bottom:var(--space-lg);border:1px solid rgba(89,60,31,0.15);box-shadow:0 8px 24px rgba(89,60,31,0.06);text-align:left;background:#fff;padding:20px;border-radius:16px;">
       <div style="display:flex;justify-content:space-between;align-items:start;margin-bottom:15px;">
         <div>
           <h3 style="font-size:var(--fs-md);color:var(--brown);margin:0;">${_esc(r.clientName)}</h3>
