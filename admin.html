@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Admin — Glow Room Hair</title>
+
+  <!-- Manifest PWA admin — start_url pointe vers /#admin -->
+  <link rel="manifest" href="admin-manifest.json">
+  <meta name="theme-color" content="#3b1f0c">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="GRH Admin">
+  <link rel="apple-touch-icon" href="images/favicon-admin.svg">
+
+  <!-- Ne pas indexer cette page -->
+  <meta name="robots" content="noindex, nofollow">
+
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: 'Jost', system-ui, sans-serif;
+      background: #3b1f0c;
+      color: #f7f0e8;
+      min-height: 100dvh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 2rem;
+      text-align: center;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    .logo {
+      width: 80px;
+      height: 80px;
+      margin-bottom: 1.5rem;
+    }
+
+    h1 {
+      font-family: Georgia, 'Times New Roman', serif;
+      font-size: 1.75rem;
+      font-weight: 700;
+      color: #c28448;
+      margin-bottom: 0.5rem;
+    }
+
+    p {
+      font-size: 0.9rem;
+      color: #d9c8b4;
+      margin-bottom: 2.5rem;
+      line-height: 1.6;
+    }
+
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.6rem;
+      background: #c28448;
+      color: #3b1f0c;
+      font-family: inherit;
+      font-size: 1rem;
+      font-weight: 600;
+      padding: 0.85rem 2rem;
+      border-radius: 9999px;
+      border: none;
+      cursor: pointer;
+      text-decoration: none;
+      transition: background 0.22s ease, transform 0.15s ease;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    .btn:hover, .btn:focus-visible {
+      background: #d9a96e;
+      outline: none;
+    }
+
+    .btn:active {
+      transform: scale(0.97);
+    }
+
+    .hint {
+      margin-top: 2.5rem;
+      font-size: 0.78rem;
+      color: #8c6b52;
+      max-width: 280px;
+      line-height: 1.5;
+    }
+
+    .divider {
+      width: 40px;
+      height: 3px;
+      background: #c28448;
+      border-radius: 9999px;
+      margin: 0 auto 1.5rem;
+    }
+  </style>
+</head>
+<body>
+
+  <svg class="logo" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" aria-hidden="true">
+    <rect width="100" height="100" rx="22" fill="#2a1508"/>
+    <circle cx="42" cy="38" r="13" fill="none" stroke="#c28448" stroke-width="6"/>
+    <line x1="51" y1="47" x2="68" y2="64" stroke="#c28448" stroke-width="6" stroke-linecap="round"/>
+    <line x1="63" y1="64" x2="63" y2="74" stroke="#c28448" stroke-width="5" stroke-linecap="round"/>
+    <line x1="63" y1="74" x2="69" y2="74" stroke="#c28448" stroke-width="5" stroke-linecap="round"/>
+    <rect x="14" y="84" width="48" height="4" rx="2" fill="#d9a96e"/>
+  </svg>
+
+  <h1>Glow Room Hair</h1>
+  <div class="divider"></div>
+  <p>Tableau de bord — Propriétaire</p>
+
+  <a class="btn" href="/#admin">
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+      <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
+      <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
+    </svg>
+    Accéder au tableau de bord
+  </a>
+
+  <p class="hint">
+    Pour ajouter ce raccourci à ton écran d'accueil :
+    iPhone → Partager → « Sur l'écran d'accueil »<br>
+    Android → Menu ⋮ → « Ajouter à l'écran d'accueil »
+  </p>
+
+</body>
+</html>
