@@ -1,13 +1,13 @@
 // ============================================================
 //  js/data.js — SOURCE UNIQUE DE VÉRITÉ
-//  Glow Room Studio · Ottawa–Gatineau
+//  Glow Room Hair · Ottawa–Gatineau
 //  ⚠ Ne pas modifier sans validation du cahier des charges
 // ============================================================
 
 // ─── SALON ──────────────────────────────────────────────────
 
 export const SALON = {
-  nom: 'Glow Room Studio',
+  nom: 'Glow Room Hair',
   slogan: 'Salon spécialisé en tresses et coiffures protectrices',
   localisation: 'Ottawa – Gatineau, Canada',
   telephone: '416-836-4556',

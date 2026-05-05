@@ -1,6 +1,6 @@
 // ============================================================
 //  js/admin.js — Dashboard admin (hash #admin)
-//  Glow Room Studio
+//  Glow Room Hair
 // ============================================================
 
 import { onPageEnter } from "./router.js";

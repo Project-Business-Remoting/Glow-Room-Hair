@@ -2,7 +2,7 @@
 
 ## Contexte du projet
 
-Site vitrine + réservation + paiement en ligne pour **Glow Room Studio**, salon spécialisé
+Site vitrine + réservation + paiement en ligne pour **Glow Room Hair**, salon spécialisé
 dans les tresses et coiffures protectrices basé à Ottawa–Gatineau, Canada.
 **Projet client réel.** Ne jamais inventer de services, prix ou informations non confirmés
 par le cahier des charges.

@@ -1,6 +1,6 @@
-# Glow Room Studio — Site web
+# Glow Room Hair — Site web
 
-Site vitrine + réservation en ligne pour **Glow Room Studio**, salon spécialisé en tresses et coiffures protectrices basé à **Ottawa–Gatineau, Canada**.
+Site vitrine + réservation en ligne pour **Glow Room Hair**, salon spécialisé en tresses et coiffures protectrices basé à **Ottawa–Gatineau, Canada**.
 
 ---
 

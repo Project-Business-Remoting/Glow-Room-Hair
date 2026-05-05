@@ -49,7 +49,7 @@ export const translations = {
     // Footer
     "footer.nav.title": "Navigation",
     "footer.contact.title": "Nous contacter",
-    "footer.copy": "&copy; <span id=\"footer-year\"></span> Glow Room Studio. Tous droits réservés.",
+    "footer.copy": "&copy; <span id=\"footer-year\"></span> Glow Room Hair. Tous droits réservés.",
 
     // Services Tab
     "services.eyebrow": "Nos prestations",
@@ -210,7 +210,7 @@ export const translations = {
     // Footer
     "footer.nav.title": "Navigation",
     "footer.contact.title": "Contact Us",
-    "footer.copy": "&copy; <span id=\"footer-year\"></span> Glow Room Studio. All rights reserved.",
+    "footer.copy": "&copy; <span id=\"footer-year\"></span> Glow Room Hair. All rights reserved.",
 
     // Services Tab
     "services.eyebrow": "Our Services",

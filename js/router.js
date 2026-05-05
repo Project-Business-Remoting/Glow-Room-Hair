@@ -1,6 +1,6 @@
 // ============================================================
 //  js/router.js — Navigation SPA (hash-based)
-//  Glow Room Studio
+//  Glow Room Hair
 //
 //  Usage depuis les autres modules :
 //    import { navigate, onPageEnter } from './router.js';

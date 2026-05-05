@@ -1,6 +1,6 @@
 // ============================================================
 //  js/booking.js — Tunnel de réservation (5 étapes)
-//  Glow Room Studio
+//  Glow Room Hair
 //
 //  Flux : S0 Bienvenue → S1 Service → S2 Date/Heure
 //         → S3 Infos → S4 Confirmation
@@ -823,5 +823,5 @@ function _esc(str) {
 }
 
 function _generateRef() {
-  return `GRS-${Date.now().toString(36).toUpperCase().slice(-6)}`;
+  return `GRH-${Date.now().toString(36).toUpperCase().slice(-6)}`;
 }

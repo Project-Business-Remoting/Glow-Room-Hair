@@ -1,6 +1,6 @@
 // ============================================================
 //  js/contact.js — Page contact : infos, horaires, formulaire
-//  Glow Room Studio
+//  Glow Room Hair
 // ============================================================
 
 import { SALON, HORAIRES } from './data.js';

@@ -1,6 +1,6 @@
 // ============================================================
 //  js/services.js — Catalogue des services
-//  Glow Room Studio
+//  Glow Room Hair
 // ============================================================
 
 import { POLITIQUES, SERVICES_FEMMES, SERVICES_HOMMES } from "./data.js";

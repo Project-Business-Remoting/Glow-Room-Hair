@@ -1,6 +1,6 @@
 // ============================================================
 //  js/main.js — Point d'entrée global
-//  Glow Room Studio
+//  Glow Room Hair
 //
 //  Ce fichier orchestre uniquement — aucune logique métier.
 // ============================================================

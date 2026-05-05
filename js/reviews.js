@@ -1,6 +1,6 @@
 // ============================================================
 //  js/reviews.js — Affichage des avis clients
-//  Glow Room Studio
+//  Glow Room Hair
 // ============================================================
 
 import { AVIS } from './data.js';
