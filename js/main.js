@@ -79,7 +79,11 @@ function _setupMobileMenu() {
   }
 
   function _close() {
-    document.activeElement.blur();
+    // Déplacer le focus vers le toggle AVANT d'appliquer aria-hidden sur le menu
+    // Évite l'avertissement a11y "focus in aria-hidden element"
+    if (menu.contains(document.activeElement)) {
+      toggle.focus();
+    }
     toggle.classList.remove("is-active");
     menu.classList.remove("is-open");
     overlay?.classList.remove("is-open");

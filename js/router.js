@@ -64,8 +64,9 @@ export function navigate(pageId, { replace = false } = {}) {
     history.pushState({ page: target }, "", hash);
   }
 
-  // Scroll immédiat en haut — 'instant' pour ne pas interférer avec fadeSlide
-  window.scrollTo({ top: 0, behavior: "instant" });
+  // Scroll immédiat en haut — bypass direct pour ignorer css scroll-behavior:smooth
+  document.documentElement.scrollTop = 0;
+  document.body.scrollTop = 0; // Safari
 
   const previous = _currentPage;
   _currentPage = target;
