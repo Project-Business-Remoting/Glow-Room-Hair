@@ -16,6 +16,10 @@ import { getLang, setLang, updateDOM } from "./i18n.js";
 // ─── BOOTSTRAP ───────────────────────────────────────────────
 
 document.addEventListener("DOMContentLoaded", () => {
+  // Année courante dans le footer — remplace l'ancien inline script
+  const yearEl = document.getElementById("footer-year");
+  if (yearEl) yearEl.textContent = new Date().getFullYear();
+
   // Les modules doivent enregistrer leurs callbacks onPageEnter AVANT
   // initRouter(), car navigate() est synchrone et déclenche immédiatement
   // les callbacks de la page initiale.

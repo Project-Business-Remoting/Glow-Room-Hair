@@ -44,9 +44,10 @@
     <link rel="preload" as="image" href="images/logo-principal.webp" />
     <link rel="preload" as="image" href="images/marley-twist.jpg" />
 
-    <!-- ── Google Fonts — preconnect avant @import dans base.css ── -->
+    <!-- ── Google Fonts — preconnect + link direct (évite @import render-blocking) ── -->
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400&family=Jost:wght@300;400;500;600&display=swap" />
 
     <!-- ── CSS — ordre de dépendance strict ──────────────── -->
     <link rel="stylesheet" href="css/base.css" />
@@ -564,11 +565,7 @@
       </div>
     </footer>
 
-    <!-- Copyright year — script synchrone minimal, s'exécute immédiatement -->
-    <script>
-      document.getElementById("footer-year").textContent =
-        new Date().getFullYear();
-    </script>
+
 
     <!-- ── Données structurées — LocalBusiness ──────────── -->
     <script type="application/ld+json">
