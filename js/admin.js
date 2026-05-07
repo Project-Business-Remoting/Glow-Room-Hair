@@ -116,6 +116,7 @@ async function _renderDashboard(root) {
       </div>
       
       <div style="display:flex;gap:var(--space-sm);align-items:center;">
+        <button type="button" class="btn btn-ghost btn--sm" data-action="change-password">Mot de passe</button>
         <button type="button" class="btn btn-ghost btn--sm" data-action="logout">Déconnexion</button>
       </div>
     </div>
@@ -259,6 +260,12 @@ function _bindEvents(root) {
       sessionStorage.removeItem("admin_password");
       _toast("Déconnecté.", "info");
       return _render();
+    }
+
+    const changePwd = e.target.closest('[data-action="change-password"]');
+    if (changePwd) {
+      _showChangePasswordModal();
+      return;
     }
 
     const rangeBtn = e.target.closest("[data-range]");
@@ -676,6 +683,101 @@ async function _blockSlot(date, slot) {
   } catch {
     _toast("Blocage impossible.", "error");
   }
+}
+
+function _showChangePasswordModal() {
+  const existing = document.getElementById("change-pwd-modal");
+  if (existing) existing.remove();
+
+  const modal = document.createElement("div");
+  modal.id = "change-pwd-modal";
+  modal.setAttribute("role", "dialog");
+  modal.setAttribute("aria-modal", "true");
+  modal.setAttribute("aria-labelledby", "change-pwd-title");
+  modal.style.cssText = [
+    "position:fixed;inset:0;z-index:9999",
+    "display:flex;align-items:center;justify-content:center;padding:1.5rem",
+    "background:rgba(59,31,12,0.65);backdrop-filter:blur(4px)",
+  ].join(";");
+
+  modal.innerHTML = `
+    <div style="background:#fff;border-radius:20px;padding:2rem;max-width:420px;width:100%;box-shadow:0 20px 60px rgba(59,31,12,0.3);">
+      <h3 id="change-pwd-title" style="font-family:var(--font-serif);color:var(--brown);margin-bottom:0.4rem;">Changer le mot de passe</h3>
+      <p style="font-size:0.83rem;color:var(--muted);margin-bottom:1.5rem;line-height:1.5;">Minimum 8 caractères. Actif immédiatement sur tous les appareils.</p>
+
+      <form id="change-pwd-form" style="display:flex;flex-direction:column;gap:1rem;" novalidate>
+        <div class="form-group" style="margin-bottom:0;">
+          <label class="form-label form-label--required" for="new-pwd">Nouveau mot de passe</label>
+          <input class="form-input" type="password" id="new-pwd" autocomplete="new-password" />
+        </div>
+        <div class="form-group" style="margin-bottom:0;">
+          <label class="form-label form-label--required" for="confirm-pwd">Confirmer</label>
+          <input class="form-input" type="password" id="confirm-pwd" autocomplete="new-password" />
+        </div>
+        <p id="change-pwd-error" style="color:var(--error,#c0392b);font-size:0.83rem;min-height:1.1em;margin:0;" aria-live="polite"></p>
+        <div style="display:flex;gap:0.75rem;margin-top:0.25rem;">
+          <button type="button" id="change-pwd-cancel" class="btn btn-ghost" style="flex:1;">Annuler</button>
+          <button type="submit" id="change-pwd-submit" class="btn btn-dark" style="flex:1;">Changer</button>
+        </div>
+      </form>
+    </div>`;
+
+  document.body.appendChild(modal);
+  modal.querySelector("#new-pwd").focus();
+
+  const close = () => modal.remove();
+
+  modal.addEventListener("click", (e) => { if (e.target === modal) close(); });
+  modal.addEventListener("keydown", (e) => { if (e.key === "Escape") close(); });
+  modal.querySelector("#change-pwd-cancel").addEventListener("click", close);
+
+  modal.querySelector("#change-pwd-form").addEventListener("submit", async (e) => {
+    e.preventDefault();
+    const newPwd     = modal.querySelector("#new-pwd").value;
+    const confirmPwd = modal.querySelector("#confirm-pwd").value;
+    const errEl      = modal.querySelector("#change-pwd-error");
+    const submitBtn  = modal.querySelector("#change-pwd-submit");
+
+    errEl.textContent = "";
+
+    if (newPwd.length < 8) {
+      errEl.textContent = "Minimum 8 caractères.";
+      modal.querySelector("#new-pwd").focus();
+      return;
+    }
+    if (newPwd !== confirmPwd) {
+      errEl.textContent = "Les mots de passe ne correspondent pas.";
+      modal.querySelector("#confirm-pwd").focus();
+      return;
+    }
+
+    submitBtn.disabled = true;
+    submitBtn.textContent = "…";
+
+    try {
+      const res = await fetch(`${BACKEND_URL}/admin/password`, {
+        method: "PATCH",
+        headers: { ..._adminHeaders(), "Content-Type": "application/json" },
+        body: JSON.stringify({ newPassword: newPwd }),
+      });
+
+      if (!res.ok) {
+        const data = await res.json().catch(() => ({}));
+        errEl.textContent = data.error || "Erreur serveur.";
+        submitBtn.disabled = false;
+        submitBtn.textContent = "Changer";
+        return;
+      }
+
+      sessionStorage.setItem("admin_password", newPwd);
+      close();
+      _toast("Mot de passe mis à jour.", "success");
+    } catch {
+      errEl.textContent = "Erreur réseau.";
+      submitBtn.disabled = false;
+      submitBtn.textContent = "Changer";
+    }
+  });
 }
 
 function _adminHeaders() {
