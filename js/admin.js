@@ -23,6 +23,33 @@ const MONTH_NAMES = [
 ];
 const DAY_ABBREVS = ["Lu", "Ma", "Me", "Je", "Ve", "Sa", "Di"];
 
+const _EYE_ON  = `<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>`;
+const _EYE_OFF = `<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"/><line x1="1" y1="1" x2="23" y2="23"/></svg>`;
+
+function _pwdFieldHTML(id, autocomplete) {
+  return `
+    <div style="position:relative;">
+      <input class="form-input" type="password" id="${id}" autocomplete="${autocomplete}" style="padding-right:2.75rem;" />
+      <button type="button" data-pwd-toggle="${id}" aria-label="Afficher le mot de passe"
+        style="position:absolute;right:0.75rem;top:50%;transform:translateY(-50%);background:none;border:none;cursor:pointer;color:var(--muted);padding:4px;line-height:0;border-radius:4px;">
+        ${_EYE_ON}
+      </button>
+    </div>`;
+}
+
+function _bindPwdToggles(container) {
+  container.querySelectorAll("[data-pwd-toggle]").forEach((btn) => {
+    btn.addEventListener("click", () => {
+      const input = container.querySelector(`#${btn.dataset.pwdToggle}`);
+      if (!input) return;
+      const show = input.type === "password";
+      input.type = show ? "text" : "password";
+      btn.innerHTML = show ? _EYE_OFF : _EYE_ON;
+      btn.setAttribute("aria-label", show ? "Masquer le mot de passe" : "Afficher le mot de passe");
+    });
+  });
+}
+
 let _calYear = null;
 let _calMonth = null; // 0-indexed
 let _selectedDate = null; // YYYY-MM-DD
@@ -74,12 +101,14 @@ function _renderLogin(root) {
       <form id="admin-login" style="max-width:460px;margin:0 auto;display:flex;flex-direction:column;gap:var(--space-md);">
         <div class="form-group">
           <label class="form-label form-label--required" for="admin-pwd">Mot de passe</label>
-          <input class="form-input" type="password" id="admin-pwd" autocomplete="current-password" />
+          ${_pwdFieldHTML("admin-pwd", "current-password")}
           <span class="form-error" id="admin-login-error" aria-live="polite"></span>
         </div>
         <button type="submit" class="btn btn-dark btn--lg">Se connecter</button>
       </form>
     </div>`;
+
+  _bindPwdToggles(root);
 
   const form = root.querySelector("#admin-login");
   form?.addEventListener("submit", (e) => {
@@ -708,11 +737,11 @@ function _showChangePasswordModal() {
       <form id="change-pwd-form" style="display:flex;flex-direction:column;gap:1rem;" novalidate>
         <div class="form-group" style="margin-bottom:0;">
           <label class="form-label form-label--required" for="new-pwd">Nouveau mot de passe</label>
-          <input class="form-input" type="password" id="new-pwd" autocomplete="new-password" />
+          ${_pwdFieldHTML("new-pwd", "new-password")}
         </div>
         <div class="form-group" style="margin-bottom:0;">
           <label class="form-label form-label--required" for="confirm-pwd">Confirmer</label>
-          <input class="form-input" type="password" id="confirm-pwd" autocomplete="new-password" />
+          ${_pwdFieldHTML("confirm-pwd", "new-password")}
         </div>
         <p id="change-pwd-error" style="color:var(--error,#c0392b);font-size:0.83rem;min-height:1.1em;margin:0;" aria-live="polite"></p>
         <div style="display:flex;gap:0.75rem;margin-top:0.25rem;">
@@ -723,6 +752,7 @@ function _showChangePasswordModal() {
     </div>`;
 
   document.body.appendChild(modal);
+  _bindPwdToggles(modal);
   modal.querySelector("#new-pwd").focus();
 
   const close = () => modal.remove();
