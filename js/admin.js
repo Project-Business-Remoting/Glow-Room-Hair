@@ -111,10 +111,11 @@ function _renderLogin(root) {
   _bindPwdToggles(root);
 
   const form = root.querySelector("#admin-login");
-  form?.addEventListener("submit", (e) => {
+  form?.addEventListener("submit", async (e) => {
     e.preventDefault();
     const input = root.querySelector("#admin-pwd");
     const errEl = root.querySelector("#admin-login-error");
+    const submitBtn = form.querySelector("button[type='submit']");
     if (!input) return;
 
     const value = input.value.trim();
@@ -125,8 +126,38 @@ function _renderLogin(root) {
       return;
     }
 
-    sessionStorage.setItem("admin_password", value);
-    _render();
+    if (errEl) errEl.textContent = "";
+    if (submitBtn) {
+      submitBtn.disabled = true;
+      submitBtn.textContent = "Vérification...";
+    }
+
+    try {
+      // Vérifier le mot de passe avant de l'enregistrer
+      const res = await fetch(`${BACKEND_URL}/admin/smtp-status`, {
+        headers: { "X-Admin-Password": value }
+      });
+
+      if (!res.ok) {
+        if (errEl) errEl.textContent = "Mot de passe incorrect.";
+        input.classList.add("is-error");
+        input.focus();
+        if (submitBtn) {
+          submitBtn.disabled = false;
+          submitBtn.textContent = "Se connecter";
+        }
+        return;
+      }
+
+      sessionStorage.setItem("admin_password", value);
+      _render();
+    } catch {
+      if (errEl) errEl.textContent = "Erreur réseau. Impossible de joindre le serveur.";
+      if (submitBtn) {
+        submitBtn.disabled = false;
+        submitBtn.textContent = "Se connecter";
+      }
+    }
   });
 }
 
